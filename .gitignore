@@ -1,0 +1,6 @@
+.env
+.env.*
+!.env.example
+node_modules/
+data/local_db.json
+npm-debug.log*

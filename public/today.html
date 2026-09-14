@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Today's Sheet · Daily Tracker</title>
+  <link rel="stylesheet" href="/css/theme.css">
+  <link rel="stylesheet" href="/css/layout.css">
+  <link rel="stylesheet" href="/css/coach.css">
+  <style>
+    .wrap {
+      max-width: 520px;
+      margin: 0 auto;
+      padding: 28px 20px 80px;
+    }
+    .top {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-end;
+      border-bottom: 1px solid var(--card-edge);
+      padding-bottom: 14px;
+      margin-bottom: 22px;
+    }
+    .top h1 {
+      font-size: 28px;
+      font-weight: 600;
+      margin: 0;
+      letter-spacing: 0.2px;
+    }
+    .top .date {
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 12px;
+      color: var(--ink-soft);
+      margin-top: 4px;
+    }
+    .streak {
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 13px;
+      text-align: right;
+      color: var(--ink-soft);
+      line-height: 1.5;
+    }
+    .streak .num {
+      font-size: 22px;
+      color: var(--rust);
+      font-weight: 700;
+    }
+    .progress-row {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 24px;
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 12px;
+      color: var(--ink-soft);
+    }
+    .progress-track {
+      flex: 1;
+      height: 7px;
+      background: var(--paper-line);
+      position: relative;
+      overflow: hidden;
+    }
+    .progress-fill {
+      position: absolute;
+      left: 0; top: 0; bottom: 0;
+      background: var(--teal);
+      width: 0%;
+      transition: width 0.4s ease;
+    }
+    .block {
+      border-top: 1px solid var(--card-edge);
+      padding: 18px 0;
+      display: flex;
+      gap: 16px;
+      align-items: flex-start;
+      transition: background 0.2s;
+    }
+    .block:last-of-type {
+      border-bottom: 1px solid var(--card-edge);
+    }
+    .checkbox {
+      flex-shrink: 0;
+      width: 22px;
+      height: 22px;
+      border: 1.5px solid var(--ink);
+      margin-top: 3px;
+      cursor: pointer;
+      position: relative;
+      background: transparent;
+      transition: all 0.2s;
+    }
+    .checkbox.checked {
+      background: var(--teal);
+      border-color: var(--teal);
+    }
+    .checkbox.checked::after {
+      content: '';
+      position: absolute;
+      left: 6px; top: 2px;
+      width: 6px; height: 11px;
+      border: solid var(--paper);
+      border-width: 0 2px 2px 0;
+      transform: rotate(40deg);
+    }
+    .block-body { flex: 1; }
+    .block-time {
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 11px;
+      color: var(--ink-soft);
+      text-transform: uppercase;
+      letter-spacing: 0.4px;
+    }
+    .block-title {
+      font-size: 17px;
+      font-weight: 600;
+      margin: 3px 0 4px;
+      transition: opacity 0.3s ease;
+    }
+    .block-title.done {
+      text-decoration: line-through;
+      text-decoration-color: var(--ink-soft);
+      opacity: 0.55;
+    }
+    .block-desc {
+      font-size: 13.5px;
+      color: var(--ink-soft);
+      line-height: 1.5;
+      font-family: 'Lora', serif;
+      font-style: italic;
+    }
+    .protected {
+      color: var(--rust);
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 10.5px;
+      letter-spacing: 0.3px;
+      margin-top: 6px;
+      display: inline-block;
+      font-weight: 600;
+    }
+    .footer-note {
+      margin-top: 26px;
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 11px;
+      color: var(--ink-soft);
+      text-align: center;
+      line-height: 1.6;
+    }
+    .tracker-actions {
+      display: flex;
+      justify-content: center;
+      gap: 10px;
+      margin-top: 20px;
+    }
+    .content-card {
+      border: 1px solid var(--card-edge);
+      background: #F5F0E1;
+      padding: 14px 16px;
+      margin-bottom: 24px;
+      cursor: pointer;
+      transition: border-color 0.2s;
+    }
+    .content-card:hover {
+      border-color: var(--teal);
+    }
+    .content-card .label {
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 10.5px;
+      letter-spacing: 0.4px;
+      color: var(--teal);
+      text-transform: uppercase;
+      display: flex;
+      justify-content: space-between;
+    }
+    .content-card .ctitle {
+      font-size: 16px;
+      font-weight: 600;
+      margin-top: 6px;
+      line-height: 1.4;
+    }
+    .content-card .cmeta {
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 11px;
+      color: var(--ink-soft);
+      margin-top: 6px;
+    }
+    .content-card .next-hint {
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 11px;
+      color: var(--ink-soft);
+      margin-top: 4px;
+    }
+  </style>
+</head>
+<body>
+
+<div id="globalNavbar"></div>
+
+<div class="wrap">
+  <div class="top">
+    <div>
+      <h1>Today's Sheet</h1>
+      <div class="date" id="dateLabel">Loading...</div>
+    </div>
+    <div class="streak">
+      streak<br>
+      <span class="num" id="streakNum">0</span>
+    </div>
+  </div>
+
+  <div class="content-card" id="contentCard" onclick="window.location.href='/calendar.html'"></div>
+
+  <div class="progress-row">
+    <span id="progressLabel">0 / 6</span>
+    <div class="progress-track"><div class="progress-fill" id="progressFill"></div></div>
+  </div>
+
+  <div id="blocks"></div>
+
+  <div class="footer-note">
+    protect the sheet — an unchecked block today doesn't erase yesterday's streak.<br>
+    it just means today wasn't finished yet.
+  </div>
+
+  <div class="tracker-actions">
+    <button class="btn-outline" id="notifyBtn">enable notifications</button>
+    <button class="btn-outline" id="resetBtn">reset today</button>
+  </div>
+</div>
+
+<script src="/js/api.js"></script>
+<script src="/js/nav.js"></script>
+<script src="/js/coach.js"></script>
+<script src="/js/today.js"></script>
+</body>
+</html>

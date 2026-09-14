@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Harsh AI Coach · Daily Tracker</title>
+  <link rel="stylesheet" href="/css/theme.css">
+  <link rel="stylesheet" href="/css/layout.css">
+  <link rel="stylesheet" href="/css/coach.css">
+  <style>
+    .coach-header-card {
+      display: flex;
+      align-items: center;
+      gap: 20px;
+      border: 1px solid var(--card-edge);
+      background: var(--card-bg);
+      padding: 20px 24px;
+      margin-bottom: 24px;
+    }
+
+    .coach-avatar-lg {
+      font-size: 56px;
+      line-height: 1;
+      position: relative;
+    }
+
+    .coach-meta h1 {
+      font-size: 24px;
+      margin: 0 0 4px 0;
+    }
+
+    .coach-meta p {
+      margin: 0;
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 12px;
+      color: var(--ink-soft);
+    }
+
+    .shout-btn {
+      background: var(--rust);
+      color: #fff;
+      border: 1px solid var(--rust-dark);
+      padding: 10px 16px;
+      font-size: 12px;
+      font-weight: 600;
+      letter-spacing: 0.5px;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .shout-btn:hover {
+      background: var(--rust-dark);
+    }
+
+    .shredder-card {
+      border: 1px solid var(--card-edge);
+      background: var(--card-bg);
+      padding: 22px;
+      margin-bottom: 24px;
+    }
+
+    .quick-excuses {
+      display: flex;
+      gap: 6px;
+      flex-wrap: wrap;
+      margin-top: 10px;
+    }
+
+    .quick-excuse-pill {
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 10.5px;
+      background: #EAE5D4;
+      border: 1px solid var(--card-edge);
+      padding: 4px 8px;
+      cursor: pointer;
+      color: var(--ink);
+    }
+
+    .quick-excuse-pill:hover {
+      background: var(--card-edge);
+    }
+  </style>
+</head>
+<body>
+
+<div id="globalNavbar"></div>
+
+<div class="page-container">
+  <div class="coach-header-card">
+    <div class="coach-avatar-lg" id="coachRoomAvatar">🪖</div>
+    <div class="coach-meta" style="flex:1;">
+      <h1 id="coachRoomName">Drill Sergeant Stone</h1>
+      <p id="coachRoomTitle">Hardcore Bootcamp Commander · ZERO TOLERANCE FOR SLACKING</p>
+      <div style="margin-top:6px;">
+        <span class="badge badge-teal" id="aiStatusBadge">⚡ POWERED BY GEMINI 2.5 FLASH AI</span>
+      </div>
+    </div>
+    <div>
+      <button class="shout-btn" id="roomYellBtn">📢 SHOUT OUT LOUD</button>
+    </div>
+  </div>
+
+  <!-- Dynamic Anger Gauge -->
+  <div class="anger-gauge-wrap">
+    <div class="anger-gauge-header">
+      <span>COACH ANGER LEVEL: <b id="angerLevelText" style="color:var(--rust);">CALCULATING...</b></span>
+      <span id="progressSummaryText">0 of 6 blocks finished</span>
+    </div>
+    <div class="anger-gauge-track">
+      <div class="anger-gauge-fill level-4" id="angerGaugeFill"></div>
+    </div>
+  </div>
+
+  <!-- The Main Screaming Hero Roast -->
+  <div class="drill-room-hero anger-4" id="roastHero">
+    <div class="badge badge-rust" id="roastBadge" style="margin-bottom:10px;">URGENT DISCIPLINE CHECK</div>
+    <h2 id="roastHeadline">EVALUATING YOUR WORK TODAY...</h2>
+    <div class="roast-content" id="roastBody">
+      Analyzing whether you actually did the work or just sat around dreaming...
+    </div>
+    <div class="action-box">
+      <b>REQUIRED ACTION RIGHT NOW:</b> <span id="actionText">Load your blocks and start Block 1.</span>
+    </div>
+
+    <div style="margin-top:18px; display:flex; gap:10px;">
+      <a href="/today.html" class="btn-primary" style="text-decoration:none; display:inline-block;">
+        → Go Check Blocks to Cool Down Coach
+      </a>
+      <button class="btn-outline" id="refreshRoastBtn">Re-evaluate Progress</button>
+    </div>
+  </div>
+
+  <!-- Excuse Shredder -->
+  <div class="shredder-card">
+    <h3 style="font-size:18px; margin-bottom:6px;">Excuse Interrogator & Shredder</h3>
+    <p style="font-family:'IBM Plex Mono', monospace; font-size:11.5px; color:var(--ink-soft); margin-top:0;">
+      Got an excuse why you haven't finished your 6 blocks today? Type it below and let the Coach destroy it.
+    </p>
+
+    <div class="excuse-box">
+      <input type="text" id="excuseInput" placeholder="e.g. 'I am too tired and waiting for inspiration'...">
+      <button class="btn-danger" id="shredBtn">Demolish Excuse</button>
+    </div>
+
+    <div class="quick-excuses">
+      <span style="font-family:'IBM Plex Mono', monospace; font-size:10px; color:var(--ink-muted); align-self:center;">Common excuses:</span>
+      <span class="quick-excuse-pill" data-excuse="I am too tired today">"I am too tired"</span>
+      <span class="quick-excuse-pill" data-excuse="I don't have enough time">"I don't have time"</span>
+      <span class="quick-excuse-pill" data-excuse="I have no motivation or inspiration">"No motivation"</span>
+      <span class="quick-excuse-pill" data-excuse="I'm afraid of rejection from clients">"Fear of rejection"</span>
+    </div>
+
+    <div class="shred-result" id="shredResult">
+      <div style="font-weight:700; color:#FF7B54; margin-bottom:6px;" id="shredQuote">EXCUSE DEMOLISHED</div>
+      <div id="shredText">...</div>
+    </div>
+  </div>
+
+  <!-- Personality Mode Selector -->
+  <div class="card">
+    <h3 style="font-size:18px; margin-bottom:6px;">Select Coach Personality</h3>
+    <p style="font-family:'IBM Plex Mono', monospace; font-size:11.5px; color:var(--ink-soft); margin-top:0;">
+      Choose who holds you accountable when you don't make progress:
+    </p>
+
+    <div class="personality-grid">
+      <div class="personality-card active" data-personality="sergeant">
+        <div class="p-avatar">🪖</div>
+        <div class="p-name">Drill Sergeant</div>
+        <div class="p-desc">Military bootcamp screaming & no mercy.</div>
+      </div>
+
+      <div class="personality-card" data-personality="mom">
+        <div class="p-avatar">👵</div>
+        <div class="p-name">Auntie Ling</div>
+        <div class="p-desc">High guilt & comparing you to cousin Timmy.</div>
+      </div>
+
+      <div class="personality-card" data-personality="wallstreet">
+        <div class="p-avatar">💼</div>
+        <div class="p-name">Rex Sterling</div>
+        <div class="p-desc">Wall street wolf. Coffee is for closers only.</div>
+      </div>
+
+      <div class="personality-card" data-personality="ramsay">
+        <div class="p-avatar">🍳</div>
+        <div class="p-name">Chef Gordon</div>
+        <div class="p-desc">Savage culinary rage. "YOUR COPY IS RAW!"</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="/js/api.js"></script>
+<script src="/js/nav.js"></script>
+<script src="/js/coach.js"></script>
+<script src="/js/coach-room.js"></script>
+</body>
+</html>

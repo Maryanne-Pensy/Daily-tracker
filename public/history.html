@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>History & Streaks · Daily Tracker</title>
+  <link rel="stylesheet" href="/css/theme.css">
+  <link rel="stylesheet" href="/css/layout.css">
+  <link rel="stylesheet" href="/css/coach.css">
+  <style>
+    .history-stats {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+      gap: 12px;
+      margin-bottom: 24px;
+    }
+    .stat-card {
+      border: 1px solid var(--card-edge);
+      background: var(--card-bg);
+      padding: 14px 16px;
+    }
+    .stat-card .val {
+      font-size: 24px;
+      font-weight: 700;
+      font-family: 'IBM Plex Mono', monospace;
+      color: var(--teal);
+    }
+    .stat-card .lbl {
+      font-size: 11px;
+      font-family: 'IBM Plex Mono', monospace;
+      color: var(--ink-soft);
+      text-transform: uppercase;
+      margin-top: 2px;
+    }
+    .history-card {
+      border: 1px solid var(--card-edge);
+      background: #FAF6EC;
+      padding: 16px 20px;
+      margin-bottom: 12px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      transition: all 0.2s;
+    }
+    .history-card.completed {
+      border-left: 4px solid var(--teal);
+      background: #F0F6F4;
+    }
+    .history-card.incomplete {
+      border-left: 4px solid var(--rust);
+    }
+    .block-dots {
+      display: flex;
+      gap: 6px;
+      margin-top: 6px;
+    }
+    .block-dot {
+      width: 14px;
+      height: 14px;
+      border: 1px solid var(--ink);
+      display: inline-block;
+      position: relative;
+    }
+    .block-dot.done {
+      background: var(--teal);
+      border-color: var(--teal);
+    }
+    .block-dot.done::after {
+      content: '';
+      position: absolute;
+      left: 3px; top: 1px;
+      width: 4px; height: 7px;
+      border: solid var(--paper);
+      border-width: 0 1.5px 1.5px 0;
+      transform: rotate(40deg);
+    }
+  </style>
+</head>
+<body>
+
+<div id="globalNavbar"></div>
+
+<div class="page-container">
+  <div class="page-header">
+    <div>
+      <h1 class="page-title">Performance History</h1>
+      <p class="page-subtitle">Your past daily sheets, streaks, and discipline log</p>
+    </div>
+  </div>
+
+  <div class="history-stats">
+    <div class="stat-card">
+      <div class="val" id="histCurrentStreak">0</div>
+      <div class="lbl">Current Streak (Days)</div>
+    </div>
+    <div class="stat-card">
+      <div class="val" id="histTotalDays">0</div>
+      <div class="lbl">Total Days Logged</div>
+    </div>
+    <div class="stat-card">
+      <div class="val" id="histTotalBlocks">0</div>
+      <div class="lbl">Total Blocks Done</div>
+    </div>
+  </div>
+
+  <div style="font-family:'IBM Plex Mono', monospace; font-size:12px; color:var(--ink-soft); margin-bottom:14px; text-transform:uppercase;">
+    Past 30 Days Log
+  </div>
+
+  <div id="historyList">
+    <div style="font-family:'IBM Plex Mono', monospace; color:var(--ink-soft);">Loading history...</div>
+  </div>
+</div>
+
+<script src="/js/api.js"></script>
+<script src="/js/nav.js"></script>
+<script src="/js/coach.js"></script>
+<script src="/js/history.js"></script>
+</body>
+</html>

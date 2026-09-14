@@ -1,0 +1,300 @@
+/* Persistent Floating Harsh Coach Widget */
+.coach-dock {
+  position: fixed;
+  right: 20px;
+  bottom: 20px;
+  z-index: 999;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  pointer-events: none;
+}
+
+.coach-dock * {
+  pointer-events: auto;
+}
+
+.coach-bubble {
+  background: var(--ink);
+  color: var(--paper);
+  padding: 12px 16px;
+  border-radius: 4px;
+  max-width: 320px;
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 11.5px;
+  line-height: 1.45;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.25);
+  margin-bottom: 10px;
+  position: relative;
+  border-left: 4px solid var(--rust);
+  opacity: 0;
+  transform: translateY(10px) scale(0.95);
+  transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  display: none;
+}
+
+.coach-bubble.visible {
+  display: block;
+  opacity: 1;
+  transform: translateY(0) scale(1);
+}
+
+.coach-bubble::after {
+  content: '';
+  position: absolute;
+  bottom: -8px;
+  right: 24px;
+  border-width: 8px 8px 0;
+  border-style: solid;
+  border-color: var(--ink) transparent;
+  display: block;
+  width: 0;
+}
+
+.coach-bubble .bubble-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-weight: 700;
+  color: #FF7B54;
+  margin-bottom: 6px;
+  font-size: 10.5px;
+  letter-spacing: 0.5px;
+}
+
+.coach-bubble .bubble-text {
+  margin: 0 0 8px 0;
+}
+
+.coach-bubble .bubble-actions {
+  display: flex;
+  gap: 8px;
+  justify-content: flex-end;
+}
+
+.coach-bubble .btn-bubble {
+  background: #363A30;
+  border: 1px solid #4C5042;
+  color: var(--paper);
+  font-size: 10px;
+  padding: 3px 7px;
+}
+
+.coach-bubble .btn-bubble:hover {
+  background: var(--rust);
+  border-color: var(--rust);
+}
+
+.coach-avatar-btn {
+  width: 62px;
+  height: 62px;
+  border-radius: 50%;
+  background: var(--paper);
+  border: 2px solid var(--ink);
+  box-shadow: 0 6px 18px rgba(0,0,0,0.18);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  position: relative;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  user-select: none;
+}
+
+.coach-avatar-btn:hover {
+  transform: scale(1.08);
+  box-shadow: 0 8px 22px rgba(0,0,0,0.25);
+}
+
+.coach-avatar-icon {
+  font-size: 26px;
+  line-height: 1;
+}
+
+.coach-rage-tag {
+  position: absolute;
+  top: -6px;
+  right: -6px;
+  background: var(--rust);
+  color: #fff;
+  font-size: 9px;
+  font-weight: 700;
+  padding: 2px 5px;
+  border-radius: 8px;
+  font-family: 'IBM Plex Mono', monospace;
+  animation: pulse 1.5s infinite;
+}
+
+/* Anger Meter Styles */
+.anger-gauge-wrap {
+  border: 1px solid var(--card-edge);
+  background: #FFFDF9;
+  padding: 16px;
+  margin-bottom: 24px;
+}
+
+.anger-gauge-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 12px;
+  margin-bottom: 8px;
+}
+
+.anger-gauge-track {
+  height: 14px;
+  background: var(--paper-line);
+  position: relative;
+  overflow: hidden;
+  border: 1px solid var(--card-edge);
+}
+
+.anger-gauge-fill {
+  height: 100%;
+  width: 25%;
+  transition: width 0.5s ease, background-color 0.5s ease;
+}
+
+.anger-gauge-fill.level-0 { width: 10%; background: #2B9348; }
+.anger-gauge-fill.level-1 { width: 35%; background: #588157; }
+.anger-gauge-fill.level-2 { width: 60%; background: #E9C46A; }
+.anger-gauge-fill.level-3 { width: 85%; background: #F4A261; }
+.anger-gauge-fill.level-4 { width: 100%; background: #E76F51; animation: rageBlink 0.6s infinite alternate; }
+
+/* Drill Room Specifics */
+.drill-room-hero {
+  border: 2px solid var(--rust);
+  background: #FAF3E8;
+  padding: 24px;
+  margin-bottom: 24px;
+  position: relative;
+}
+
+.drill-room-hero.anger-4 {
+  background: #FFF1EE;
+  border-color: #D32F2F;
+}
+
+.drill-room-hero h2 {
+  color: var(--rust);
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 20px;
+  letter-spacing: 0.5px;
+  margin-bottom: 12px;
+  text-transform: uppercase;
+}
+
+.drill-room-hero .roast-content {
+  font-size: 17px;
+  line-height: 1.55;
+  font-weight: 500;
+  margin-bottom: 18px;
+}
+
+.drill-room-hero .action-box {
+  background: rgba(181, 80, 42, 0.08);
+  border-left: 3px solid var(--rust);
+  padding: 10px 14px;
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 12px;
+  margin-top: 14px;
+}
+
+/* Excuse Shredder */
+.excuse-box {
+  display: flex;
+  gap: 8px;
+  margin-top: 12px;
+}
+
+.excuse-box input {
+  flex: 1;
+}
+
+.shred-result {
+  margin-top: 16px;
+  padding: 14px;
+  background: var(--ink);
+  color: var(--paper);
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 12.5px;
+  line-height: 1.5;
+  border-left: 4px solid #FF7B54;
+  display: none;
+}
+
+.shred-result.show {
+  display: block;
+  animation: fadeIn 0.3s ease;
+}
+
+/* Personality Selector */
+.personality-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: 10px;
+  margin-top: 12px;
+}
+
+.personality-card {
+  border: 1px solid var(--card-edge);
+  background: #FFFDF9;
+  padding: 12px;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.personality-card:hover {
+  border-color: var(--ink);
+}
+
+.personality-card.active {
+  border-color: var(--teal);
+  background: #EDF6F3;
+  box-shadow: 0 0 0 1px var(--teal);
+}
+
+.personality-card .p-avatar {
+  font-size: 24px;
+  margin-bottom: 4px;
+}
+
+.personality-card .p-name {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.personality-card .p-desc {
+  font-size: 11px;
+  color: var(--ink-soft);
+  margin-top: 4px;
+}
+
+/* Animations */
+@keyframes pulse {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.15); }
+  100% { transform: scale(1); }
+}
+
+@keyframes rageBlink {
+  from { opacity: 1; }
+  to { opacity: 0.6; }
+}
+
+@keyframes screenShake {
+  0% { transform: translate(0, 0); }
+  20% { transform: translate(-4px, 3px); }
+  40% { transform: translate(4px, -3px); }
+  60% { transform: translate(-3px, -2px); }
+  80% { transform: translate(3px, 2px); }
+  100% { transform: translate(0, 0); }
+}
+
+.shake-it {
+  animation: screenShake 0.4s ease-in-out;
+}

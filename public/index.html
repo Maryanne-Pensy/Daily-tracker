@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Daily Sheet Tracker</title>
+  <script src="/js/api.js"></script>
+  <script>
+    if (API.getToken()) {
+      window.location.replace('/today.html');
+    } else {
+      window.location.replace('/login.html');
+    }
+  </script>
+</head>
+<body style="background:#EDE7D6; font-family:sans-serif; text-align:center; padding-top:100px;">
+  <p style="color:#5B5A4E;">Loading Daily Sheet Tracker...</p>
+</body>
+</html>
