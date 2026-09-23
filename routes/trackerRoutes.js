@@ -1,164 +1,117 @@
 const express = require('express');
 const authMiddleware = require('../middleware/auth');
 const storage = require('../services/storage');
+const { buildToday } = require('../services/today');
+const { todayStr } = require('../utils/dates');
 
 const router = express.Router();
 
-const BLOCKS = [
-  {
-    id: 0,
-    time: "Block 1 · 45–60 min",
-    title: "Research 3 clients",
-    desc: "Pull store profile, visible email gaps, likely customer for each."
-  },
-  {
-    id: 1,
-    time: "Block 2 · 90–120 min",
-    title: "Write 3 email samples",
-    desc: "Draft yourself first — slow and rough beats fast and borrowed."
-  },
-  {
-    id: 2,
-    time: "Block 3 · 30–45 min",
-    title: "Editing pass",
-    desc: "Bring drafts in for review. Revise before moving on."
-  },
-  {
-    id: 3,
-    time: "Block 4 · 45–60 min",
-    title: "Send outreach",
-    desc: "Pitch with the finished samples attached."
-  },
-  {
-    id: 4,
-    time: "Block 5 · 60–90 min",
-    title: "Content — script + edit",
-    desc: "Write your own first draft. Then editing pass, then visuals."
-  },
-  {
-    id: 5,
-    time: "Block 6 · 60–90 min",
-    title: "Trade IQ",
-    desc: "One real move forward — feedback, a fix, or outreach.",
-    protectedNote: "PROTECTED — do not skip for overrun"
-  }
-];
+const TEXT_FIELDS = ['mission', 'productWorkNote', 'learningNote', 'notes'];
+const BOOL_FIELDS = ['missionDone', 'productWork', 'learningDone'];
+const NEEDLE_CATEGORIES = ['build', 'customers', 'validation'];
 
-function getTodayStr() {
-  const d = new Date();
-  return d.toISOString().slice(0, 10);
+function cleanChecklist(list) {
+  return (Array.isArray(list) ? list : []).slice(0, 20).map(i => ({
+    label: String(i.label || '').slice(0, 200),
+    tag: ['product', 'customers'].includes(i.tag) ? i.tag : '',
+    done: Boolean(i.done)
+  }));
 }
 
-function getYesterdayStr(dateStr) {
-  const d = new Date(dateStr + 'T00:00:00');
-  d.setDate(d.getDate() - 1);
-  return d.toISOString().slice(0, 10);
+function cleanNeedle(list) {
+  return (Array.isArray(list) ? list : []).slice(0, 50).map(n => ({
+    category: NEEDLE_CATEGORIES.includes(n.category) ? n.category : 'build',
+    text: String(n.text || '').slice(0, 300),
+    done: Boolean(n.done)
+  }));
+}
+
+function todayResponse(data) {
+  const { user, ...rest } = data;
+  return rest;
 }
 
 // GET /api/tracker/today
 router.get('/today', authMiddleware, async (req, res) => {
   try {
-    const today = getTodayStr();
-    const user = await storage.findUserById(req.user.userId);
-    const progress = await storage.getTodayProgress(req.user.userId, today);
-    const calendar = await storage.getContentCalendar(req.user.userId);
-
-    const todayContent = calendar.find(c => c.date === today);
-    const upcomingContent = calendar.find(c => c.date > today && c.status !== 'posted');
-
-    res.json({
-      date: today,
-      blocks: BLOCKS,
-      checked: progress.checked || [false, false, false, false, false, false],
-      completedCount: (progress.checked || []).filter(Boolean).length,
-      streak: (user && user.streak) ? user.streak : { count: 0, lastCompletedDate: null },
-      todayContent: todayContent || null,
-      upcomingContent: upcomingContent || null
-    });
+    res.json(todayResponse(await buildToday(req.user.userId)));
   } catch (err) {
     console.error('Tracker today error:', err);
-    res.status(500).json({ error: 'Failed to fetch today progress.' });
+    res.status(500).json({ error: 'Failed to fetch today.' });
   }
 });
 
-// POST /api/tracker/toggle
-router.post('/toggle', authMiddleware, async (req, res) => {
+// PUT /api/tracker/today — save any subset of today's fields
+router.put('/today', authMiddleware, async (req, res) => {
   try {
-    const { blockIndex, checkedState } = req.body;
-    const today = getTodayStr();
-
-    if (blockIndex === undefined || blockIndex < 0 || blockIndex >= BLOCKS.length) {
-      return res.status(400).json({ error: 'Invalid block index.' });
-    }
-
-    const progress = await storage.getTodayProgress(req.user.userId, today);
-    const currentChecked = [...(progress.checked || [false, false, false, false, false, false])];
-    
-    // Toggle or set explicitly
-    if (typeof checkedState === 'boolean') {
-      currentChecked[blockIndex] = checkedState;
-    } else {
-      currentChecked[blockIndex] = !currentChecked[blockIndex];
-    }
-
-    const updatedProgress = await storage.updateTodayProgress(req.user.userId, today, currentChecked);
-
-    // Handle Streak Updates
-    const user = await storage.findUserById(req.user.userId);
-    let streak = (user && user.streak) ? { ...user.streak } : { count: 0, lastCompletedDate: null };
-    const allDone = currentChecked.every(Boolean);
-
-    if (allDone && streak.lastCompletedDate !== today) {
-      const yesterday = getYesterdayStr(today);
-      if (streak.lastCompletedDate === yesterday) {
-        streak.count += 1;
-      } else {
-        streak.count = 1;
+    const userId = req.user.userId;
+    const current = await buildToday(userId);
+    const updates = {};
+    TEXT_FIELDS.forEach(f => { if (typeof req.body[f] === 'string') updates[f] = req.body[f].slice(0, 2000); });
+    BOOL_FIELDS.forEach(f => { if (req.body[f] !== undefined) updates[f] = Boolean(req.body[f]); });
+    if (req.body.needle !== undefined) updates.needle = cleanNeedle(req.body.needle);
+    if (req.body.tradeiqChecklist !== undefined) updates.tradeiqChecklist = cleanChecklist(req.body.tradeiqChecklist);
+    if (req.body.slotlyChecklist !== undefined) {
+      updates.slotlyChecklist = cleanChecklist(req.body.slotlyChecklist);
+      // Label edits become the default checklist for future days.
+      const labels = updates.slotlyChecklist.map(i => ({ label: i.label, tag: i.tag }));
+      const oldLabels = (current.day.slotlyChecklist || []).map(i => ({ label: i.label, tag: i.tag }));
+      if (JSON.stringify(labels) !== JSON.stringify(oldLabels)) {
+        const preferences = { ...((current.user && current.user.preferences) || {}), slotlyChecklist: labels };
+        await storage.updateUser(userId, { preferences });
       }
-      streak.lastCompletedDate = today;
-      await storage.updateUser(req.user.userId, { streak });
     }
 
-    res.json({
-      success: true,
-      checked: updatedProgress.checked,
-      completedCount: updatedProgress.completedCount,
-      isCompleted: updatedProgress.isCompleted,
-      streak
-    });
+    await storage.update('progress', userId, current.day._id, updates);
+    res.json(todayResponse(await buildToday(userId)));
   } catch (err) {
-    console.error('Tracker toggle error:', err);
-    res.status(500).json({ error: 'Failed to update progress.' });
+    console.error('Tracker update error:', err);
+    res.status(500).json({ error: 'Failed to save today.' });
   }
 });
 
-// POST /api/tracker/reset
+// POST /api/tracker/reset — uncheck everything for today (text is kept)
 router.post('/reset', authMiddleware, async (req, res) => {
   try {
-    const today = getTodayStr();
-    const resetChecked = [false, false, false, false, false, false];
-    const updated = await storage.updateTodayProgress(req.user.userId, today, resetChecked);
-    res.json({
-      success: true,
-      message: 'Today progress reset.',
-      checked: updated.checked,
-      completedCount: 0
+    const userId = req.user.userId;
+    const { day } = await buildToday(userId);
+    const uncheck = list => (list || []).map(i => ({ ...i, done: false }));
+    await storage.update('progress', userId, day._id, {
+      missionDone: false,
+      productWork: false,
+      learningDone: false,
+      slotlyChecklist: uncheck(day.slotlyChecklist),
+      needle: uncheck(day.needle),
+      tradeiqChecklist: uncheck(day.tradeiqChecklist)
     });
+    res.json(todayResponse(await buildToday(userId)));
   } catch (err) {
     console.error('Tracker reset error:', err);
-    res.status(500).json({ error: 'Failed to reset progress.' });
+    res.status(500).json({ error: 'Failed to reset today.' });
   }
 });
 
 // GET /api/tracker/history
 router.get('/history', authMiddleware, async (req, res) => {
   try {
-    const history = await storage.getUserProgressHistory(req.user.userId);
-    const user = await storage.findUserById(req.user.userId);
-    res.json({
-      history,
-      streak: (user && user.streak) ? user.streak : { count: 0, lastCompletedDate: null }
+    const userId = req.user.userId;
+    const { streak } = await buildToday(userId);
+    const days = await storage.find('progress', userId, {}, { date: -1 });
+    const history = days.slice(0, 60).map(d => {
+      const legacy = (d.schemaVersion || 1) < 2;
+      return {
+        date: d.date,
+        legacy,
+        checked: legacy ? (d.checked || []) : undefined,
+        score: legacy ? (d.checked || []).filter(Boolean).length : (d.score || 0),
+        maxScore: legacy ? 6 : (d.maxScore || 5),
+        mainMoved: Boolean(d.isCompleted),
+        mission: d.mission || '',
+        needleDone: (d.needle || []).filter(n => n.done).map(n => n.text),
+        isToday: d.date === todayStr()
+      };
     });
+    res.json({ history, streak });
   } catch (err) {
     console.error('Tracker history error:', err);
     res.status(500).json({ error: 'Failed to retrieve history.' });

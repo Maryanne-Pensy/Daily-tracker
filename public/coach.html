@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Harsh AI Coach · Daily Tracker</title>
+  <title>Coach · Builder OS</title>
   <link rel="stylesheet" href="/css/theme.css">
   <link rel="stylesheet" href="/css/layout.css">
   <link rel="stylesheet" href="/css/coach.css">
@@ -91,9 +91,9 @@
     <div class="coach-avatar-lg" id="coachRoomAvatar">🪖</div>
     <div class="coach-meta" style="flex:1;">
       <h1 id="coachRoomName">Drill Sergeant Stone</h1>
-      <p id="coachRoomTitle">Hardcore Bootcamp Commander · ZERO TOLERANCE FOR SLACKING</p>
+      <p id="coachRoomTitle">Bootcamp Commander</p>
       <div style="margin-top:6px;">
-        <span class="badge badge-teal" id="aiStatusBadge">⚡ POWERED BY GEMINI 2.5 FLASH AI</span>
+        <span class="badge badge-teal" id="aiStatusBadge">CHECKING...</span>
       </div>
     </div>
     <div>
@@ -105,7 +105,7 @@
   <div class="anger-gauge-wrap">
     <div class="anger-gauge-header">
       <span>COACH ANGER LEVEL: <b id="angerLevelText" style="color:var(--rust);">CALCULATING...</b></span>
-      <span id="progressSummaryText">0 of 6 blocks finished</span>
+      <span id="progressSummaryText">score 0 / 5 today</span>
     </div>
     <div class="anger-gauge-track">
       <div class="anger-gauge-fill level-4" id="angerGaugeFill"></div>
@@ -114,18 +114,18 @@
 
   <!-- The Main Screaming Hero Roast -->
   <div class="drill-room-hero anger-4" id="roastHero">
-    <div class="badge badge-rust" id="roastBadge" style="margin-bottom:10px;">URGENT DISCIPLINE CHECK</div>
-    <h2 id="roastHeadline">EVALUATING YOUR WORK TODAY...</h2>
+    <div class="badge badge-rust" id="roastBadge" style="margin-bottom:10px;">FOCUS CHECK</div>
+    <h2 id="roastHeadline">CHECKING TODAY...</h2>
     <div class="roast-content" id="roastBody">
-      Analyzing whether you actually did the work or just sat around dreaming...
+      Looking at what actually moved today...
     </div>
     <div class="action-box">
-      <b>REQUIRED ACTION RIGHT NOW:</b> <span id="actionText">Load your blocks and start Block 1.</span>
+      <b>REQUIRED ACTION RIGHT NOW:</b> <span id="actionText">Open Today and set your Slotly mission.</span>
     </div>
 
     <div style="margin-top:18px; display:flex; gap:10px;">
       <a href="/today.html" class="btn-primary" style="text-decoration:none; display:inline-block;">
-        → Go Check Blocks to Cool Down Coach
+        → Back to Today
       </a>
       <button class="btn-outline" id="refreshRoastBtn">Re-evaluate Progress</button>
     </div>
@@ -133,22 +133,22 @@
 
   <!-- Excuse Shredder -->
   <div class="shredder-card">
-    <h3 style="font-size:18px; margin-bottom:6px;">Excuse Interrogator & Shredder</h3>
+    <h3 style="font-size:18px; margin-bottom:6px;">Excuse Shredder</h3>
     <p style="font-family:'IBM Plex Mono', monospace; font-size:11.5px; color:var(--ink-soft); margin-top:0;">
-      Got an excuse why you haven't finished your 6 blocks today? Type it below and let the Coach destroy it.
+      Got a reason not to do the main thing? Type it — the coach will turn it into the smallest next step.
     </p>
 
     <div class="excuse-box">
-      <input type="text" id="excuseInput" placeholder="e.g. 'I am too tired and waiting for inspiration'...">
+      <input type="text" id="excuseInput" placeholder="e.g. 'I'd rather work on TradeIQ today'...">
       <button class="btn-danger" id="shredBtn">Demolish Excuse</button>
     </div>
 
     <div class="quick-excuses">
       <span style="font-family:'IBM Plex Mono', monospace; font-size:10px; color:var(--ink-muted); align-self:center;">Common excuses:</span>
-      <span class="quick-excuse-pill" data-excuse="I am too tired today">"I am too tired"</span>
-      <span class="quick-excuse-pill" data-excuse="I don't have enough time">"I don't have time"</span>
-      <span class="quick-excuse-pill" data-excuse="I have no motivation or inspiration">"No motivation"</span>
-      <span class="quick-excuse-pill" data-excuse="I'm afraid of rejection from clients">"Fear of rejection"</span>
+      <span class="quick-excuse-pill" data-excuse="I am too tired today">"Too tired"</span>
+      <span class="quick-excuse-pill" data-excuse="I'd rather work on TradeIQ today">"TradeIQ is more fun"</span>
+      <span class="quick-excuse-pill" data-excuse="I just had a great new project idea">"New idea!"</span>
+      <span class="quick-excuse-pill" data-excuse="I'm afraid clinics will say no">"Clinics will say no"</span>
     </div>
 
     <div class="shred-result" id="shredResult">
@@ -161,34 +161,37 @@
   <div class="card">
     <h3 style="font-size:18px; margin-bottom:6px;">Select Coach Personality</h3>
     <p style="font-family:'IBM Plex Mono', monospace; font-size:11.5px; color:var(--ink-soft); margin-top:0;">
-      Choose who holds you accountable when you don't make progress:
+      Same priorities, different voice. Tough, funny, direct — never abusive.
     </p>
 
     <div class="personality-grid">
       <div class="personality-card active" data-personality="sergeant">
         <div class="p-avatar">🪖</div>
         <div class="p-name">Drill Sergeant</div>
-        <div class="p-desc">Military bootcamp screaming & no mercy.</div>
+        <div class="p-desc">Loud, short orders. No excuses.</div>
       </div>
 
       <div class="personality-card" data-personality="mom">
         <div class="p-avatar">👵</div>
         <div class="p-name">Auntie Ling</div>
-        <div class="p-desc">High guilt & comparing you to cousin Timmy.</div>
+        <div class="p-desc">Warm, high expectations, relentless.</div>
       </div>
 
       <div class="personality-card" data-personality="wallstreet">
         <div class="p-avatar">💼</div>
         <div class="p-name">Rex Sterling</div>
-        <div class="p-desc">Wall street wolf. Coffee is for closers only.</div>
+        <div class="p-desc">Everything comes back to revenue.</div>
       </div>
 
       <div class="personality-card" data-personality="ramsay">
         <div class="p-avatar">🍳</div>
         <div class="p-name">Chef Gordon</div>
-        <div class="p-desc">Savage culinary rage. "YOUR COPY IS RAW!"</div>
+        <div class="p-desc">Fiery but fair. "Finish the plate!"</div>
       </div>
     </div>
+    <label class="check-inline" style="margin-top:14px;">
+      <input type="checkbox" id="voiceToggle"> Read the coach out loud automatically when it's worried
+    </label>
   </div>
 </div>
 

@@ -3,13 +3,16 @@ const express = require('express');
 const cors = require('cors');
 const path = require('path');
 const { connectDB, getMongoStatus } = require('./config/db');
+const { TZ, todayStr } = require('./utils/dates');
 
 // Route imports
 const authRoutes = require('./routes/authRoutes');
 const trackerRoutes = require('./routes/trackerRoutes');
 const contentRoutes = require('./routes/contentRoutes');
-const outreachRoutes = require('./routes/outreachRoutes');
+const prospectRoutes = require('./routes/prospectRoutes');
 const coachRoutes = require('./routes/coachRoutes');
+const reviewRoutes = require('./routes/reviewRoutes');
+const { products, projects, learning } = require('./routes/resourceRoutes');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -29,7 +32,11 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.use('/api/auth', authRoutes);
 app.use('/api/tracker', trackerRoutes);
 app.use('/api/content', contentRoutes);
-app.use('/api/outreach', outreachRoutes);
+app.use('/api/prospects', prospectRoutes);
+app.use('/api/products', products);
+app.use('/api/projects', projects);
+app.use('/api/learning', learning);
+app.use('/api/review', reviewRoutes);
 app.use('/api/coach', coachRoutes);
 
 // Health & DB Status Endpoint
@@ -37,48 +44,37 @@ app.get('/api/status', (req, res) => {
   res.json({
     status: 'online',
     timestamp: new Date().toISOString(),
+    today: todayStr(),
+    timezone: TZ,
     database: getMongoStatus(),
-    appVersion: '2.0.0'
+    appVersion: '3.0.0'
   });
 });
 
-// Clean URL friendly routes for each tab
-app.get('/today', (req, res) => {
-  res.sendFile(path.join(__dirname, 'public', 'today.html'));
+// Clean URLs for each page (old tab names redirect to their replacements)
+const PAGES = ['today', 'clinics', 'content', 'products', 'focus', 'review', 'history', 'coach', 'login'];
+PAGES.forEach(page => {
+  app.get('/' + page, (req, res) => {
+    res.sendFile(path.join(__dirname, 'public', page + '.html'));
+  });
 });
+app.get(['/calendar', '/calendar.html'], (req, res) => res.redirect('/content.html'));
+app.get(['/outreach', '/outreach.html'], (req, res) => res.redirect('/clinics.html'));
 
-app.get('/calendar', (req, res) => {
-  res.sendFile(path.join(__dirname, 'public', 'calendar.html'));
-});
-
-app.get('/outreach', (req, res) => {
-  res.sendFile(path.join(__dirname, 'public', 'outreach.html'));
-});
-
-app.get('/coach', (req, res) => {
-  res.sendFile(path.join(__dirname, 'public', 'coach.html'));
-});
-
-app.get('/history', (req, res) => {
-  res.sendFile(path.join(__dirname, 'public', 'history.html'));
-});
-
-app.get('/login', (req, res) => {
-  res.sendFile(path.join(__dirname, 'public', 'login.html'));
-});
-
-// Catch-all to index
+// Unknown API routes get JSON, everything else the index redirect
+app.use('/api', (req, res) => res.status(404).json({ error: 'Not found.' }));
 app.get('*', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'index.html'));
 });
 
 app.listen(PORT, () => {
   console.log(`\n======================================================`);
-  console.log(`  Daily Tracker Server running on http://localhost:${PORT}`);
-  console.log(`  - Today's Sheet:    http://localhost:${PORT}/today`);
-  console.log(`  - Content Calendar: http://localhost:${PORT}/calendar`);
-  console.log(`  - Outreach Board:   http://localhost:${PORT}/outreach`);
-  console.log(`  - Harsh AI Coach:   http://localhost:${PORT}/coach`);
-  console.log(`  - History:          http://localhost:${PORT}/history`);
+  console.log(`  Builder OS running on http://localhost:${PORT}  (timezone ${TZ})`);
+  console.log(`  - Today:     http://localhost:${PORT}/today`);
+  console.log(`  - Clinics:   http://localhost:${PORT}/clinics`);
+  console.log(`  - Content:   http://localhost:${PORT}/content`);
+  console.log(`  - Products:  http://localhost:${PORT}/products`);
+  console.log(`  - Focus:     http://localhost:${PORT}/focus`);
+  console.log(`  - Review:    http://localhost:${PORT}/review`);
   console.log(`======================================================\n`);
 });

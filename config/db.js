@@ -1,8 +1,18 @@
 const mongoose = require('mongoose');
 
 let isConnected = false;
+let readyPromise = null;
 
-const connectDB = async () => {
+// Resolves once the first connection attempt has finished (either way), so
+// requests arriving during startup don't silently write to the local fallback.
+const whenReady = () => readyPromise || Promise.resolve();
+
+const connectDB = () => {
+  readyPromise = connect();
+  return readyPromise;
+};
+
+const connect = async () => {
   const uri = process.env.MONGODB_URI || 'mongodb://127.0.0.1:27017/daily_sheet';
   
   try {
@@ -43,4 +53,4 @@ const getMongoStatus = () => {
   };
 };
 
-module.exports = { connectDB, getMongoStatus };
+module.exports = { connectDB, getMongoStatus, whenReady };

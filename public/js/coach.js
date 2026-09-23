@@ -19,19 +19,19 @@ const HarshCoachWidget = {
       <div class="coach-bubble" id="coachBubble">
         <div class="bubble-header">
           <span id="coachBubbleName">Drill Sergeant Stone</span>
-          <span id="coachBubbleRage">ANGER: LEVEL 4</span>
+          <span id="coachBubbleRage"></span>
         </div>
         <p class="bubble-text" id="coachBubbleText">Checking your progress...</p>
         <div class="bubble-actions">
           <button class="btn-bubble" id="coachVoiceBtn" title="Shout voice through speakers">📢 YELL ALOUD</button>
-          <a href="/coach.html" class="btn-bubble" style="text-decoration:none;">DRILL ROOM</a>
+          <a href="/coach.html" class="btn-bubble" style="text-decoration:none;">COACH</a>
           <button class="btn-bubble" id="coachDismissBtn">✕</button>
         </div>
       </div>
 
-      <div class="coach-avatar-btn" id="coachAvatarBtn" title="Click to talk to Harsh AI Coach">
+      <div class="coach-avatar-btn" id="coachAvatarBtn" title="Coach">
         <span class="coach-avatar-icon" id="coachAvatarIcon">🪖</span>
-        <span class="coach-rage-tag" id="coachRageTag">ANGRY</span>
+        <span class="coach-rage-tag" id="coachRageTag">...</span>
       </div>
     `;
 
@@ -80,16 +80,18 @@ const HarshCoachWidget = {
     avatar.textContent = data.profile ? data.profile.avatar : '🪖';
     bubbleName.textContent = data.profile ? data.profile.name : 'Harsh Coach';
 
-    const rageLabels = ['CALM', 'WATCHING', 'IRRITATED', 'BOILING', 'MAX RAGE 😡'];
-    const currentRageLabel = rageLabels[data.angerLevel] || 'ANGRY';
+    const rageLabels = ['PROUD', 'ON TRACK', 'NUDGING', 'WORRIED', 'URGENT'];
+    const currentRageLabel = rageLabels[data.angerLevel] || 'ON TRACK';
     rageTag.textContent = currentRageLabel;
-    bubbleRage.textContent = `ANGER: ${currentRageLabel}`;
+    bubbleRage.textContent = currentRageLabel;
     bubbleText.textContent = data.roast;
 
-    // Shake screen if anger level is maximum (0 progress or late day slacking)
+    // Pop the bubble open when the main mission is slipping; shake only when it's urgent
     if (data.angerLevel >= 3 && !suppressAutoPopup) {
-      document.body.classList.add('shake-it');
-      setTimeout(() => document.body.classList.remove('shake-it'), 450);
+      if (data.angerLevel >= 4) {
+        document.body.classList.add('shake-it');
+        setTimeout(() => document.body.classList.remove('shake-it'), 450);
+      }
       bubble.classList.add('visible');
 
       // Auto-voice if user enabled voice setting in profile

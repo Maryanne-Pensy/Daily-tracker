@@ -12,18 +12,13 @@ async function initHistoryPage() {
 
 async function loadHistory() {
   try {
-    const data = await API.request('/api/tracker/history');
+    const data = await API.get('/api/tracker/history');
     if (!data) return;
 
-    document.getElementById('histCurrentStreak').textContent = data.streak ? data.streak.count : 0;
     const history = data.history || [];
+    document.getElementById('histCurrentStreak').textContent = data.streak ? data.streak.count : 0;
     document.getElementById('histTotalDays').textContent = history.length;
-
-    let totalBlocks = 0;
-    history.forEach(h => {
-      totalBlocks += (h.checked || []).filter(Boolean).length;
-    });
-    document.getElementById('histTotalBlocks').textContent = totalBlocks;
+    document.getElementById('histTotalBlocks').textContent = history.filter(h => h.mainMoved).length;
 
     renderHistoryList(history);
   } catch (err) {
@@ -33,50 +28,38 @@ async function loadHistory() {
 
 function renderHistoryList(history) {
   const container = document.getElementById('historyList');
-  container.innerHTML = '';
 
   if (history.length === 0) {
-    container.innerHTML = `
-      <div style="padding:30px; text-align:center; font-family:'IBM Plex Mono', monospace; color:var(--ink-soft); border:1px dashed var(--card-edge);">
-        No past days recorded yet. Check off blocks today to start your permanent record!
-      </div>
-    `;
+    container.innerHTML = '<div class="empty">No days recorded yet. Open Today and move the main mission to start your record.</div>';
     return;
   }
 
-  history.forEach(item => {
-    const card = document.createElement('div');
-    const checked = item.checked || [false, false, false, false, false, false];
-    const doneCount = checked.filter(Boolean).length;
-    const isFull = doneCount === 6;
-
-    card.className = `history-card ${isFull ? 'completed' : 'incomplete'}`;
-
-    const d = new Date(item.date + 'T00:00:00');
-    const dateFormatted = d.toLocaleDateString(undefined, { weekday: 'long', year: 'numeric', month: 'short', day: 'numeric' });
-
-    let dotsHtml = '';
-    for (let i = 0; i < 6; i++) {
-      dotsHtml += `<span class="block-dot ${checked[i] ? 'done' : ''}" title="Block ${i + 1}: ${checked[i] ? 'Finished' : 'Skipped'}"></span>`;
+  container.innerHTML = history.map(item => {
+    const dateFormatted = API.fmtDate(item.date, { weekday: 'long', year: 'numeric', month: 'short', day: 'numeric' });
+    let detail;
+    if (item.legacy) {
+      // Old copywriter sheet: 6 blocks
+      const checked = item.checked || [];
+      detail = `<div class="block-dots">${[0, 1, 2, 3, 4, 5].map(i =>
+        `<span class="block-dot ${checked[i] ? 'done' : ''}" title="Block ${i + 1}"></span>`).join('')}</div>
+        <div class="small muted mono" style="margin-top:4px;">copywriting sheet</div>`;
+    } else {
+      detail = `
+        ${item.mission ? `<div class="small" style="margin-top:4px;">🔥 ${API.esc(item.mission)}</div>` : ''}
+        ${item.needleDone.length ? `<div class="small muted" style="margin-top:2px;">${item.needleDone.map(API.esc).join(' · ')}</div>` : ''}`;
     }
-
-    card.innerHTML = `
-      <div>
-        <div style="font-weight:600; font-size:16px;">${dateFormatted}</div>
-        <div class="block-dots">${dotsHtml}</div>
-      </div>
-      <div style="text-align:right;">
-        <span class="badge ${isFull ? 'badge-teal' : 'badge-rust'}">
-          ${doneCount} / 6 Blocks
-        </span>
-        <div style="font-family:'IBM Plex Mono', monospace; font-size:11px; color:var(--ink-soft); margin-top:4px;">
-          ${isFull ? '100% Complete' : 'Incomplete'}
+    return `
+      <div class="history-card ${item.mainMoved ? 'completed' : 'incomplete'}">
+        <div style="flex:1;min-width:0;">
+          <div style="font-weight:600; font-size:16px;">${dateFormatted}${item.isToday ? ' · today' : ''}</div>
+          ${detail}
         </div>
-      </div>
-    `;
-
-    container.appendChild(card);
-  });
+        <div style="text-align:right;">
+          <span class="badge ${item.mainMoved ? 'badge-teal' : 'badge-rust'}">${item.score} / ${item.maxScore}</span>
+          <div class="small muted mono" style="margin-top:4px;">${item.mainMoved ? 'main mission moved' : 'main mission didn\'t move'}</div>
+        </div>
+      </div>`;
+  }).join('');
 }
 
 initHistoryPage();

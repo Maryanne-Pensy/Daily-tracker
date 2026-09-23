@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Content · Builder OS</title>
+  <link rel="stylesheet" href="/css/theme.css">
+  <link rel="stylesheet" href="/css/layout.css">
+  <link rel="stylesheet" href="/css/coach.css">
+</head>
+<body>
+
+<div id="globalNavbar"></div>
+
+<div class="page-container wide">
+  <div class="page-header">
+    <div>
+      <h1 class="page-title">Content</h1>
+      <p class="page-subtitle" id="tabSubtitle">Slotly marketing · 30 days → booked demo calls</p>
+    </div>
+  </div>
+
+  <div class="tabs" id="streamTabs">
+    <button class="tab" data-stream="slotly">Slotly marketing</button>
+    <button class="tab" data-stream="products">Digital product videos</button>
+    <button class="tab" data-stream="copywriting">Copywriting archive</button>
+  </div>
+
+  <div class="stat-grid" id="statGrid"></div>
+
+  <form class="add-row hidden" id="quickAdd" style="margin-bottom:14px; flex-wrap:wrap;">
+    <input type="date" id="qaDate" class="compact" style="flex:0 0 150px;">
+    <input type="text" id="qaTitle" class="compact" placeholder="What am I uploading? (e.g. 3 cybersecurity mistakes small businesses make)" style="flex:1 1 260px;">
+    <select id="qaPlatform" class="compact"></select>
+    <select id="qaProduct" class="compact"></select>
+    <button type="submit" class="btn-primary">Add</button>
+  </form>
+
+  <div class="chip-row" id="filters"></div>
+
+  <div id="itemList"><div class="empty">Loading content...</div></div>
+
+  <button class="btn-outline hidden" id="addDayBtn" style="margin-top:8px;">+ Add another day</button>
+</div>
+
+<script src="/js/api.js"></script>
+<script src="/js/nav.js"></script>
+<script src="/js/coach.js"></script>
+<script src="/js/content.js"></script>
+</body>
+</html>

@@ -85,7 +85,15 @@ router.get('/me', authMiddleware, async (req, res) => {
 // PUT /api/auth/settings
 router.put('/settings', authMiddleware, async (req, res) => {
   try {
-    const { coachSettings } = req.body;
+    // Merge so changing one setting (e.g. personality) doesn't wipe the others.
+    const user = await storage.findUserById(req.user.userId);
+    const current = (user && user.coachSettings) || {};
+    const incoming = req.body.coachSettings || {};
+    const coachSettings = {
+      personality: incoming.personality || current.personality || 'sergeant',
+      voiceEnabled: incoming.voiceEnabled !== undefined ? Boolean(incoming.voiceEnabled) : Boolean(current.voiceEnabled),
+      rageLevelOverride: current.rageLevelOverride === undefined ? null : current.rageLevelOverride
+    };
     const updated = await storage.updateUser(req.user.userId, { coachSettings });
     res.json({ success: true, coachSettings: updated ? updated.coachSettings : coachSettings });
   } catch (err) {

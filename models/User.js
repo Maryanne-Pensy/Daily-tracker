@@ -20,6 +20,7 @@ const userSchema = new mongoose.Schema({
     required: [true, 'Password is required'],
     minlength: 6
   },
+  // Legacy cached streak; the live streak is computed from DailyProgress.
   streak: {
     count: { type: Number, default: 0 },
     lastCompletedDate: { type: String, default: null }
@@ -29,6 +30,11 @@ const userSchema = new mongoose.Schema({
     voiceEnabled: { type: Boolean, default: false },
     rageLevelOverride: { type: Number, default: null }
   },
+  preferences: {
+    // Editable default Slotly checklist: [{ label, tag }]
+    slotlyChecklist: { type: [mongoose.Schema.Types.Mixed], default: undefined }
+  },
+  setupVersion: { type: Number, default: 0 },
   createdAt: {
     type: Date,
     default: Date.now

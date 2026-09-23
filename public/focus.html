@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Focus · Builder OS</title>
+  <link rel="stylesheet" href="/css/theme.css">
+  <link rel="stylesheet" href="/css/layout.css">
+  <link rel="stylesheet" href="/css/coach.css">
+  <style>
+    .os-table { width: 100%; border-collapse: collapse; font-family: 'IBM Plex Mono', monospace; font-size: 12.5px; }
+    .os-table td { padding: 7px 0; border-bottom: 1px solid var(--paper-line); vertical-align: top; }
+    .os-table td:first-child { color: var(--ink-soft); width: 42%; padding-right: 10px; }
+    .os-table td:last-child { font-weight: 700; color: var(--ink); }
+    .os-quote { margin: 14px 0 0; font-style: italic; color: var(--ink-soft); font-size: 14px; }
+    .range-row { display: flex; align-items: center; gap: 10px; }
+    .range-row input[type="range"] { flex: 1; accent-color: var(--teal); padding: 0; border: none; background: none; }
+    .lesson-row { display: flex; gap: 6px; align-items: center; padding: 5px 0; border-bottom: 1px solid var(--paper-line); }
+    .lesson-row .t { flex: 1; font-size: 13.5px; }
+    section { scroll-margin-top: 90px; }
+  </style>
+</head>
+<body>
+
+<div id="globalNavbar"></div>
+
+<div class="page-container">
+  <div class="page-header">
+    <div>
+      <h1 class="page-title">Focus</h1>
+      <p class="page-subtitle">What I'm working on — and what I'm deliberately not working on yet</p>
+    </div>
+  </div>
+
+  <section class="os-section primary">
+    <div class="section-head"><span class="section-label">Operating system</span></div>
+    <table class="os-table">
+      <tr><td>Main working hours</td><td>SLOTLY</td></tr>
+      <tr><td>Evening</td><td>DIGITAL PRODUCTS + CONTENT</td></tr>
+      <tr><td>Weekends</td><td>TRADEIQ</td></tr>
+      <tr><td>Background</td><td>COPYWRITING = SUPPORTING LEARNING</td></tr>
+      <tr><td>Everything else</td><td>PARKING LOT</td></tr>
+    </table>
+    <p class="os-quote">"I don't need more ideas. I need focused execution and finished products."</p>
+  </section>
+
+  <section class="os-section" id="slotly"></section>
+  <section class="os-section" id="tradeiq"></section>
+  <section class="os-section" id="learning"></section>
+
+  <section class="os-section" id="parking">
+    <div class="section-head">
+      <span class="section-label">💡 Project parking lot</span>
+      <span class="section-meta">Safe here. Never shows up as a task on Today.</span>
+    </div>
+    <form class="add-row" id="parkForm" style="margin-bottom:12px;">
+      <input type="text" id="parkInput" class="compact" placeholder="Idea name">
+      <button type="submit" class="btn-outline">Park it</button>
+    </form>
+    <div id="parkedList"></div>
+  </section>
+</div>
+
+<script src="/js/api.js"></script>
+<script src="/js/nav.js"></script>
+<script src="/js/coach.js"></script>
+<script src="/js/focus.js"></script>
+</body>
+</html>

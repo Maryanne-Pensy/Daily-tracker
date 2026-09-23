@@ -1,5 +1,17 @@
 const mongoose = require('mongoose');
 
+const checkItem = new mongoose.Schema({
+  label: { type: String, default: '' },
+  tag: { type: String, default: '' }, // Slotly: product | customers | '' (counts as product)
+  done: { type: Boolean, default: false }
+}, { _id: false });
+
+const needleItem = new mongoose.Schema({
+  category: { type: String, default: 'build' }, // build | customers | validation
+  text: { type: String, default: '' },
+  done: { type: Boolean, default: false }
+}, { _id: false });
+
 const dailyProgressSchema = new mongoose.Schema({
   userId: {
     type: mongoose.Schema.Types.ObjectId,
@@ -12,14 +24,33 @@ const dailyProgressSchema = new mongoose.Schema({
     required: true,
     index: true
   },
+  // 1 = old copywriter 6-block sheet, 2 = Builder OS day
+  schemaVersion: { type: Number, default: 1 },
+
+  // Legacy copywriter sheet (kept for history)
   checked: {
     type: [Boolean],
-    default: [false, false, false, false, false, false]
+    default: undefined
   },
   completedCount: {
     type: Number,
     default: 0
   },
+
+  // Builder OS day
+  mission: { type: String, default: '' },
+  missionDone: { type: Boolean, default: false },
+  slotlyChecklist: { type: [checkItem], default: undefined },
+  needle: { type: [needleItem], default: undefined },
+  productWork: { type: Boolean, default: false },
+  productWorkNote: { type: String, default: '' },
+  learningDone: { type: Boolean, default: false },
+  learningNote: { type: String, default: '' },
+  tradeiqChecklist: { type: [checkItem], default: undefined },
+  score: { type: Number, default: 0 },
+  maxScore: { type: Number, default: 0 },
+
+  // true = the day's main mission moved (counts toward the streak)
   isCompleted: {
     type: Boolean,
     default: false

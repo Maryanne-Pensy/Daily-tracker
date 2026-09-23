@@ -1,11 +1,13 @@
 {
   "name": "daily-sheet-tracker",
-  "version": "2.0.0",
-  "description": "Multi-page daily work tracker with MongoDB, authentication, and a harsh AI coach.",
+  "version": "3.0.0",
+  "description": "Builder OS: personal operating system for Slotly, digital products, TradeIQ weekends and focused execution.",
   "main": "server.js",
   "scripts": {
     "start": "node server.js",
-    "dev": "node --watch server.js"
+    "dev": "node --watch server.js",
+    "test": "node test_server.js",
+    "create-user": "node scripts/create-user.js"
   },
   "dependencies": {
     "bcryptjs": "^2.4.3",

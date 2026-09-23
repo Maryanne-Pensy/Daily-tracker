@@ -1,3 +1,14 @@
+const NAV_TABS = [
+  ['today', 'Today'],
+  ['clinics', 'Clinics'],
+  ['content', 'Content'],
+  ['products', 'Products'],
+  ['focus', 'Focus'],
+  ['review', 'Review'],
+  ['history', 'History'],
+  ['coach', 'Coach']
+];
+
 function renderNavbar(activeTab) {
   const user = API.getUser();
   const navContainer = document.getElementById('globalNavbar');
@@ -7,28 +18,15 @@ function renderNavbar(activeTab) {
   navContainer.innerHTML = `
     <div class="navbar-inner">
       <a href="/today.html" class="nav-brand">
-        DAILY SHEET
-        <span class="tag">v2.0</span>
+        BUILDER OS
+        <span class="tag">v3</span>
       </a>
 
       <ul class="nav-links">
-        <li class="nav-item">
-          <a href="/today.html" class="${activeTab === 'today' ? 'active' : ''}">Today's Sheet</a>
-        </li>
-        <li class="nav-item">
-          <a href="/calendar.html" class="${activeTab === 'calendar' ? 'active' : ''}">Content Calendar</a>
-        </li>
-        <li class="nav-item">
-          <a href="/outreach.html" class="${activeTab === 'outreach' ? 'active' : ''}">Outreach Board</a>
-        </li>
-        <li class="nav-item">
-          <a href="/coach.html" class="${activeTab === 'coach' ? 'active' : ''}">
-            <span style="color:var(--rust)">🔥</span> AI Coach
-          </a>
-        </li>
-        <li class="nav-item">
-          <a href="/history.html" class="${activeTab === 'history' ? 'active' : ''}">History</a>
-        </li>
+        ${NAV_TABS.map(([key, label]) => `
+          <li class="nav-item">
+            <a href="/${key}.html" class="${activeTab === key ? 'active' : ''}">${label}</a>
+          </li>`).join('')}
       </ul>
 
       <div class="nav-right">
@@ -36,7 +34,7 @@ function renderNavbar(activeTab) {
           <span class="dot online" id="dbStatusDot"></span>
           <span id="dbStatusText">Checking DB...</span>
         </div>
-        ${user ? `<span class="user-badge">${user.username}</span>` : ''}
+        ${user ? `<span class="user-badge">${API.esc(user.username)}</span>` : ''}
         <button class="logout-btn" onclick="API.clearSession()">Sign Out</button>
       </div>
     </div>

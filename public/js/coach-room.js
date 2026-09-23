@@ -34,14 +34,19 @@ function renderCoachRoom(data) {
   }
 
   // Update Anger Gauge
-  const angerLabels = ['0 - CALM / PROUD ✅', '1 - SUSPICIOUS 👀', '2 - IRRITATED ⚠️', '3 - ANGRY SHOUTING 🔥', '4 - MAXIMUM RAGE MELTDOWN 😡'];
+  const angerLabels = ['0 - PROUD ✅', '1 - ON TRACK 👀', '2 - NUDGING ⚠️', '3 - MAIN MISSION SLIPPING 🔥', '4 - DROP EVERYTHING 😡'];
   const angerText = document.getElementById('angerLevelText');
   const angerFill = document.getElementById('angerGaugeFill');
   const progressText = document.getElementById('progressSummaryText');
 
   angerText.textContent = angerLabels[data.angerLevel] || 'LEVEL 3';
   angerFill.className = `anger-gauge-fill level-${data.angerLevel}`;
-  progressText.textContent = `${data.completedCount} of ${data.totalBlocks} blocks finished today`;
+  progressText.textContent = `score ${data.points} / ${data.max} today`;
+
+  const aiBadge = document.getElementById('aiStatusBadge');
+  aiBadge.textContent = data.isAiPowered ? '⚡ GEMINI AI' : 'BUILT-IN COACH (AI OFFLINE)';
+  aiBadge.className = data.isAiPowered ? 'badge badge-teal' : 'badge badge-gray';
+  document.getElementById('voiceToggle').checked = Boolean(data.voiceEnabled);
 
   // Update Hero Roast
   const hero = document.getElementById('roastHero');
@@ -49,7 +54,7 @@ function renderCoachRoom(data) {
 
   document.getElementById('roastHeadline').textContent = data.headline;
   document.getElementById('roastBody').textContent = data.roast;
-  document.getElementById('actionText').textContent = data.actionPrompt || 'Start Block 1 now.';
+  document.getElementById('actionText').textContent = data.actionPrompt || 'Open Today and pick the next action.';
 
   // Highlight active personality
   document.querySelectorAll('.personality-card').forEach(card => {
@@ -88,7 +93,7 @@ async function demolishExcuse() {
   const excuse = input.value.trim();
 
   if (!excuse) {
-    API.showToast('Please type an excuse for the Coach to dismantle!');
+    API.showToast('Type an excuse first!');
     return;
   }
 
@@ -100,7 +105,7 @@ async function demolishExcuse() {
 
     if (res) {
       const resultBox = document.getElementById('shredResult');
-      document.getElementById('shredQuote').textContent = `COACH RAGE: ${res.rageQuote}`;
+      document.getElementById('shredQuote').textContent = res.rageQuote;
       document.getElementById('shredText').textContent = res.shredded;
       resultBox.classList.add('show');
 
@@ -152,6 +157,11 @@ function setupEventListeners() {
       document.getElementById('excuseInput').value = pill.getAttribute('data-excuse');
       demolishExcuse();
     });
+  });
+
+  document.getElementById('voiceToggle').addEventListener('change', async (e) => {
+    const res = await API.put('/api/auth/settings', { coachSettings: { voiceEnabled: e.target.checked } }).catch(() => null);
+    API.showToast(res && res.success ? (e.target.checked ? 'Coach will speak up automatically.' : 'Auto-voice off.') : 'Could not save setting.');
   });
 
   // Personality cards

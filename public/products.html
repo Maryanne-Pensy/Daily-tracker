@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Digital Products · Builder OS</title>
+  <link rel="stylesheet" href="/css/theme.css">
+  <link rel="stylesheet" href="/css/layout.css">
+  <link rel="stylesheet" href="/css/coach.css">
+  <style>
+    .version-input { width: 80px; }
+    .building { padding: 0 12px 10px; font-size: 13px; color: var(--ink-soft); }
+    .building input { width: 100%; }
+  </style>
+</head>
+<body>
+
+<div id="globalNavbar"></div>
+
+<div class="page-container wide">
+  <div class="page-header">
+    <div>
+      <h1 class="page-title">Digital Products</h1>
+      <p class="page-subtitle">Evening work · build the product, then ship the content that sells it</p>
+    </div>
+    <a href="/content.html#products" class="btn-outline" style="text-decoration:none;">Video tracker →</a>
+  </div>
+
+  <form class="add-row" id="quickAdd" style="margin-bottom:18px; flex-wrap:wrap;">
+    <input type="text" id="qaName" class="compact" placeholder="New product (e.g. AI Automation Guide)" style="flex:1 1 240px;">
+    <select id="qaCategory" class="compact"></select>
+    <button type="submit" class="btn-primary">+ Add product</button>
+  </form>
+
+  <div class="chip-row" id="filters"></div>
+  <div id="productList"><div class="empty">Loading products...</div></div>
+</div>
+
+<script src="/js/api.js"></script>
+<script src="/js/nav.js"></script>
+<script src="/js/coach.js"></script>
+<script src="/js/products.js"></script>
+</body>
+</html>

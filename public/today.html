@@ -3,228 +3,165 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Today's Sheet · Daily Tracker</title>
+  <title>Today · Builder OS</title>
   <link rel="stylesheet" href="/css/theme.css">
   <link rel="stylesheet" href="/css/layout.css">
   <link rel="stylesheet" href="/css/coach.css">
   <style>
-    .wrap {
-      max-width: 520px;
-      margin: 0 auto;
-      padding: 28px 20px 80px;
-    }
-    .top {
+    .today-top {
       display: flex;
       justify-content: space-between;
       align-items: flex-end;
+      gap: 12px;
       border-bottom: 1px solid var(--card-edge);
       padding-bottom: 14px;
-      margin-bottom: 22px;
+      margin-bottom: 12px;
     }
-    .top h1 {
-      font-size: 28px;
-      font-weight: 600;
-      margin: 0;
-      letter-spacing: 0.2px;
-    }
-    .top .date {
-      font-family: 'IBM Plex Mono', monospace;
-      font-size: 12px;
-      color: var(--ink-soft);
-      margin-top: 4px;
-    }
-    .streak {
-      font-family: 'IBM Plex Mono', monospace;
-      font-size: 13px;
-      text-align: right;
-      color: var(--ink-soft);
-      line-height: 1.5;
-    }
-    .streak .num {
-      font-size: 22px;
-      color: var(--rust);
-      font-weight: 700;
-    }
-    .progress-row {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      margin-bottom: 24px;
-      font-family: 'IBM Plex Mono', monospace;
-      font-size: 12px;
-      color: var(--ink-soft);
-    }
-    .progress-track {
-      flex: 1;
-      height: 7px;
-      background: var(--paper-line);
-      position: relative;
-      overflow: hidden;
-    }
-    .progress-fill {
-      position: absolute;
-      left: 0; top: 0; bottom: 0;
-      background: var(--teal);
-      width: 0%;
-      transition: width 0.4s ease;
-    }
-    .block {
-      border-top: 1px solid var(--card-edge);
-      padding: 18px 0;
-      display: flex;
-      gap: 16px;
-      align-items: flex-start;
-      transition: background 0.2s;
-    }
-    .block:last-of-type {
-      border-bottom: 1px solid var(--card-edge);
-    }
-    .checkbox {
-      flex-shrink: 0;
-      width: 22px;
-      height: 22px;
-      border: 1.5px solid var(--ink);
-      margin-top: 3px;
-      cursor: pointer;
-      position: relative;
-      background: transparent;
-      transition: all 0.2s;
-    }
-    .checkbox.checked {
-      background: var(--teal);
-      border-color: var(--teal);
-    }
-    .checkbox.checked::after {
-      content: '';
-      position: absolute;
-      left: 6px; top: 2px;
-      width: 6px; height: 11px;
-      border: solid var(--paper);
-      border-width: 0 2px 2px 0;
-      transform: rotate(40deg);
-    }
-    .block-body { flex: 1; }
-    .block-time {
-      font-family: 'IBM Plex Mono', monospace;
-      font-size: 11px;
-      color: var(--ink-soft);
-      text-transform: uppercase;
-      letter-spacing: 0.4px;
-    }
-    .block-title {
-      font-size: 17px;
-      font-weight: 600;
-      margin: 3px 0 4px;
-      transition: opacity 0.3s ease;
-    }
-    .block-title.done {
-      text-decoration: line-through;
-      text-decoration-color: var(--ink-soft);
-      opacity: 0.55;
-    }
-    .block-desc {
-      font-size: 13.5px;
-      color: var(--ink-soft);
-      line-height: 1.5;
-      font-family: 'Lora', serif;
-      font-style: italic;
-    }
-    .protected {
-      color: var(--rust);
-      font-family: 'IBM Plex Mono', monospace;
-      font-size: 10.5px;
-      letter-spacing: 0.3px;
-      margin-top: 6px;
+    .today-top h1 { font-size: 28px; margin: 0; }
+    .today-date { font-family: 'IBM Plex Mono', monospace; font-size: 12px; color: var(--ink-soft); margin-top: 4px; }
+    .phase {
       display: inline-block;
-      font-weight: 600;
-    }
-    .footer-note {
-      margin-top: 26px;
+      margin-top: 8px;
       font-family: 'IBM Plex Mono', monospace;
       font-size: 11px;
-      color: var(--ink-soft);
-      text-align: center;
-      line-height: 1.6;
-    }
-    .tracker-actions {
-      display: flex;
-      justify-content: center;
-      gap: 10px;
-      margin-top: 20px;
-    }
-    .content-card {
-      border: 1px solid var(--card-edge);
-      background: #F5F0E1;
-      padding: 14px 16px;
-      margin-bottom: 24px;
-      cursor: pointer;
-      transition: border-color 0.2s;
-    }
-    .content-card:hover {
-      border-color: var(--teal);
-    }
-    .content-card .label {
-      font-family: 'IBM Plex Mono', monospace;
-      font-size: 10.5px;
+      padding: 3px 8px;
+      background: var(--teal);
+      color: var(--paper);
       letter-spacing: 0.4px;
-      color: var(--teal);
-      text-transform: uppercase;
-      display: flex;
-      justify-content: space-between;
     }
-    .content-card .ctitle {
-      font-size: 16px;
-      font-weight: 600;
-      margin-top: 6px;
-      line-height: 1.4;
-    }
-    .content-card .cmeta {
-      font-family: 'IBM Plex Mono', monospace;
-      font-size: 11px;
-      color: var(--ink-soft);
-      margin-top: 6px;
-    }
-    .content-card .next-hint {
-      font-family: 'IBM Plex Mono', monospace;
-      font-size: 11px;
-      color: var(--ink-soft);
-      margin-top: 4px;
-    }
+    .score-box { text-align: right; font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: var(--ink-soft); line-height: 1.5; }
+    .score-box .num { font-size: 22px; font-weight: 700; color: var(--teal); }
+    .score-box .streak-num { color: var(--rust); font-weight: 700; font-size: 14px; }
+    .score-items { display: flex; flex-wrap: wrap; gap: 4px 12px; margin-bottom: 16px; font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: var(--ink-muted); }
+    .score-items .on { color: var(--teal); font-weight: 600; }
+    .score-items .half { color: #9A7B2F; }
+    .mission-row { display: flex; align-items: center; gap: 10px; }
+    .mission-row input[type="checkbox"] { width: 24px; height: 24px; accent-color: var(--teal); flex-shrink: 0; }
+    .mission-row.done .big-input { text-decoration: line-through; color: var(--ink-muted); }
+    .video-row { padding: 10px 0; border-bottom: 1px solid var(--paper-line); }
+    .video-row:last-child { border-bottom: none; }
+    .video-row .video-label { font-family: 'IBM Plex Mono', monospace; font-size: 11px; font-weight: 700; color: var(--ink-soft); margin-bottom: 4px; display: flex; justify-content: space-between; }
+    .video-row.posted .video-label { color: var(--teal); }
+    .video-controls { display: flex; gap: 6px; margin-top: 6px; flex-wrap: wrap; }
+    .video-controls select { flex: 1 1 110px; }
+    .posted-count { font-family: 'IBM Plex Mono', monospace; font-size: 13px; font-weight: 700; }
+    .posted-count.met { color: var(--teal); }
+    .slotly-post { margin-top: 14px; padding-top: 12px; border-top: 1px dashed var(--card-edge); display: flex; gap: 8px; align-items: center; flex-wrap: wrap; font-size: 13.5px; }
+    .slotly-post .t { flex: 1 1 200px; }
+    .learn-row { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; font-family: 'IBM Plex Mono', monospace; font-size: 12px; color: var(--ink-soft); }
+    .learn-row input { width: 64px; }
+    .learn-row input.module { width: 150px; }
+    .footer-actions { display: flex; justify-content: center; gap: 10px; margin-top: 10px; }
   </style>
 </head>
 <body>
 
 <div id="globalNavbar"></div>
 
-<div class="wrap">
-  <div class="top">
+<div class="page-container">
+  <div class="today-top">
     <div>
-      <h1>Today's Sheet</h1>
-      <div class="date" id="dateLabel">Loading...</div>
+      <h1>Today</h1>
+      <div class="today-date" id="dateLabel">Loading...</div>
+      <span class="phase" id="phaseLabel"></span>
     </div>
-    <div class="streak">
-      streak<br>
-      <span class="num" id="streakNum">0</span>
+    <div class="score-box">
+      today's score<br>
+      <span class="num" id="scoreNum">0</span> / <span id="scoreMax">5</span><br>
+      streak <span class="streak-num" id="streakNum">0</span>
     </div>
   </div>
+  <div class="score-items" id="scoreItems"></div>
 
-  <div class="content-card" id="contentCard" onclick="window.location.href='/calendar.html'"></div>
+  <div id="banners"></div>
 
-  <div class="progress-row">
-    <span id="progressLabel">0 / 6</span>
-    <div class="progress-track"><div class="progress-fill" id="progressFill"></div></div>
+  <div id="sections">
+    <!-- Slotly: the main mission -->
+    <section class="os-section primary" id="secSlotly">
+      <div class="section-head">
+        <span class="section-label">🔥 Main mission · Slotly</span>
+        <span class="section-meta">Did I move Slotly closer to a paying clinic today?</span>
+      </div>
+
+      <label class="field-label" for="missionInput">Today's highest-value task</label>
+      <div class="mission-row" id="missionRow">
+        <input type="checkbox" id="missionDone" title="Done">
+        <input type="text" class="big-input" id="missionInput" placeholder="e.g. Finish payment integration">
+      </div>
+
+      <label class="field-label">Slotly checklist</label>
+      <ul class="check-list" id="slotlyChecklist"></ul>
+      <button class="link-btn" id="addChecklistBtn">+ add checklist item</button>
+
+      <label class="field-label">Push the needle — actions that actually moved it</label>
+      <ul class="check-list" id="needleList"></ul>
+      <form class="add-row" id="needleForm">
+        <select id="needleCategory" class="compact">
+          <option value="build">Build</option>
+          <option value="customers">Customers</option>
+          <option value="validation">Validation</option>
+        </select>
+        <input type="text" id="needleText" class="compact" placeholder="Fix booking bug · DM 5 clinics · Ask about their workflow">
+        <button type="submit" class="btn-outline">Add</button>
+      </form>
+
+      <label class="field-label">Progress</label>
+      <div class="progress-row" style="margin-bottom:8px;">
+        <span id="milestoneText" style="flex:0 1 auto;"></span>
+        <div class="progress-track"><div class="progress-fill" id="slotlyProgress"></div></div>
+        <span id="slotlyProgressPct">0%</span>
+      </div>
+      <div class="mini-stats" id="slotlyStats"></div>
+
+      <div class="slotly-post hidden" id="slotlyPost"></div>
+    </section>
+
+    <!-- Digital products + content -->
+    <section class="os-section" id="secContent">
+      <div class="section-head">
+        <span class="section-label">🎥 Digital product content</span>
+        <span class="posted-count" id="postedCount">0 / 2 posted today</span>
+      </div>
+      <div id="videoRows"></div>
+      <button class="link-btn" id="addVideoBtn">+ another video</button>
+
+      <div style="margin-top:14px;">
+        <label class="check-inline"><input type="checkbox" id="productWork"> Worked on a digital product today</label>
+        <input type="text" class="full compact" id="productWorkNote" style="margin-top:6px;" placeholder="What I built / improved (e.g. Cybersecurity Guide: rewrote chapter 2)">
+      </div>
+    </section>
+
+    <!-- Learning -->
+    <section class="os-section" id="secLearning">
+      <div class="section-head">
+        <span class="section-label">🧠 Learning</span>
+        <a class="section-meta" href="/focus.html#learning">key lessons →</a>
+      </div>
+      <div class="learn-row" id="learningRow"></div>
+      <input type="text" class="full compact" id="learningNote" style="margin-top:8px;" placeholder="Today's lesson — and where I'll apply it">
+      <div style="margin-top:8px;">
+        <label class="check-inline"><input type="checkbox" id="learningDone"> Did today's learning</label>
+      </div>
+    </section>
+
+    <!-- TradeIQ: weekend project -->
+    <section class="os-section quiet" id="secWeekend"></section>
+
+    <!-- Parking lot -->
+    <section class="os-section quiet" id="secParking">
+      <div class="section-head" style="margin-bottom:6px;">
+        <span class="section-label">💡 Parking lot</span>
+        <span class="section-meta"><span id="parkedCount">0</span> parked ideas · <a href="/focus.html#parking">View</a></span>
+      </div>
+      <form class="add-row" id="parkForm">
+        <input type="text" id="parkInput" class="compact" placeholder="New idea? Park it here and get back to work.">
+        <button type="submit" class="btn-outline">Park it</button>
+      </form>
+    </section>
   </div>
 
-  <div id="blocks"></div>
-
-  <div class="footer-note">
-    protect the sheet — an unchecked block today doesn't erase yesterday's streak.<br>
-    it just means today wasn't finished yet.
-  </div>
-
-  <div class="tracker-actions">
-    <button class="btn-outline" id="notifyBtn">enable notifications</button>
-    <button class="btn-outline" id="resetBtn">reset today</button>
+  <div class="footer-actions">
+    <button class="btn-outline" id="resetBtn">uncheck everything today</button>
   </div>
 </div>
 

@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Clinic Prospects · Builder OS</title>
+  <link rel="stylesheet" href="/css/theme.css">
+  <link rel="stylesheet" href="/css/layout.css">
+  <link rel="stylesheet" href="/css/coach.css">
+  <style>
+    .fu-date { width: 150px; }
+    .fu-label { font-family: 'IBM Plex Mono', monospace; font-size: 10px; color: var(--ink-soft); text-transform: uppercase; }
+  </style>
+</head>
+<body>
+
+<div id="globalNavbar"></div>
+
+<div class="page-container wide">
+  <div class="page-header">
+    <div>
+      <h1 class="page-title">Clinic Prospects</h1>
+      <p class="page-subtitle">Slotly pipeline · aesthetic practitioners & small clinics → first paying clinic</p>
+    </div>
+  </div>
+
+  <div class="stat-grid" id="statGrid"></div>
+
+  <form class="add-row" id="quickAdd" style="margin-bottom:14px; flex-wrap:wrap;">
+    <input type="text" id="qaName" class="compact" placeholder="Clinic name" style="flex:1 1 200px;">
+    <input type="text" id="qaLink" class="compact" placeholder="Instagram / website (optional)" style="flex:1 1 200px;">
+    <button type="submit" class="btn-primary">+ Add clinic</button>
+  </form>
+
+  <div class="chip-row" id="filters"></div>
+
+  <div id="leadList"><div class="empty">Loading prospects...</div></div>
+</div>
+
+<script src="/js/api.js"></script>
+<script src="/js/nav.js"></script>
+<script src="/js/coach.js"></script>
+<script src="/js/clinics.js"></script>
+</body>
+</html>
