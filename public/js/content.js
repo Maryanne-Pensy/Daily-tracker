@@ -1,9 +1,7 @@
-// One page for every content stream: Slotly marketing, digital-product videos,
-// and the archived copywriting calendar.
+// One page for both content streams: Slotly marketing and digital-product videos.
 const STREAMS = {
   slotly: { subtitle: 'Slotly marketing · 30 days → booked demo calls (not views)' },
-  products: { subtitle: 'Digital product & tech videos · target: 2 posted per day' },
-  copywriting: { subtitle: 'Archived calendar from the old copywriting tracker — kept for reference' }
+  products: { subtitle: 'Digital product & tech videos · target: 2 posted per day' }
 };
 const CONTENT_TYPES = [['', 'Type'], ['reel', 'Reel'], ['carousel', 'Carousel'], ['short', 'Short'], ['video', 'Video'], ['story', 'Story'], ['post', 'Post'], ['other', 'Other']];
 const FILTERS = [['all', 'All'], ['idea', 'Ideas'], ['scripted', 'Scripted'], ['recorded', 'Recorded'], ['edited', 'Edited'], ['scheduled', 'Scheduled'], ['posted', 'Posted']];
@@ -26,7 +24,7 @@ async function initContentPage() {
   const [status, productRes, prospectRes] = await Promise.all([
     fetch('/api/status').then(r => r.json()).catch(() => ({})),
     API.get('/api/products').catch(() => null),
-    API.get('/api/prospects?kind=clinic').catch(() => null)
+    API.get('/api/prospects').catch(() => null)
   ]);
   today = status.today || new Date().toISOString().slice(0, 10);
   products = productRes ? productRes.items.filter(p => p.status !== 'archived') : [];
@@ -87,15 +85,13 @@ function renderStats() {
       [count(i => ['scripted', 'recorded', 'edited', 'scheduled'].includes(i.status)), 'In progress'],
       [pipeline ? pipeline.demosBooked : '–', 'Demos booked (the goal)']
     ];
-  } else if (stream === 'products') {
+  } else {
     cards = [
       [`${count(i => i.postedDate === today)} / 2`, 'Posted today'],
       [count(i => i.status !== 'posted' && i.date >= today), 'Planned ahead'],
       [count(i => i.status === 'idea'), 'Ideas'],
       [posted, 'Posted total']
     ];
-  } else {
-    cards = [[items.length, 'Items'], [posted, 'Posted']];
   }
   $('statGrid').innerHTML = cards.map(([val, lbl]) =>
     `<div class="stat-card"><div class="val">${val}</div><div class="lbl">${lbl}</div></div>`).join('');
@@ -147,10 +143,10 @@ function itemHtml(item) {
         ${field('Post link', 'link', 'placeholder="https://..."')}
         ${field('Results', 'results', 'placeholder="views, saves, DMs, demos booked..."')}
         ${area('Notes', 'notes')}
-        ${stream !== 'products' || item.script ? area('Script', 'script', 4) : ''}
+        ${stream === 'slotly' || item.script ? area('Script', 'script', 4) : ''}
       </div>
       <div class="detail-actions">
-        <span class="item-meta">${item.legacyStatus ? 'Original status: ' + API.esc(item.legacyStatus) : ''}</span>
+        <span></span>
         <button class="btn-danger" data-act="delete" style="font-size:11px;">Delete</button>
       </div>
     </div>

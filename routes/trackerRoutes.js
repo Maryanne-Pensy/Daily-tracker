@@ -97,20 +97,15 @@ router.get('/history', authMiddleware, async (req, res) => {
     const userId = req.user.userId;
     const { streak } = await buildToday(userId);
     const days = await storage.find('progress', userId, {}, { date: -1 });
-    const history = days.slice(0, 60).map(d => {
-      const legacy = (d.schemaVersion || 1) < 2;
-      return {
-        date: d.date,
-        legacy,
-        checked: legacy ? (d.checked || []) : undefined,
-        score: legacy ? (d.checked || []).filter(Boolean).length : (d.score || 0),
-        maxScore: legacy ? 6 : (d.maxScore || 5),
-        mainMoved: Boolean(d.isCompleted),
-        mission: d.mission || '',
-        needleDone: (d.needle || []).filter(n => n.done).map(n => n.text),
-        isToday: d.date === todayStr()
-      };
-    });
+    const history = days.filter(d => (d.schemaVersion || 1) >= 2).slice(0, 60).map(d => ({
+      date: d.date,
+      score: d.score || 0,
+      maxScore: d.maxScore || 5,
+      mainMoved: Boolean(d.isCompleted),
+      mission: d.mission || '',
+      needleDone: (d.needle || []).filter(n => n.done).map(n => n.text),
+      isToday: d.date === todayStr()
+    }));
     res.json({ history, streak });
   } catch (err) {
     console.error('Tracker history error:', err);

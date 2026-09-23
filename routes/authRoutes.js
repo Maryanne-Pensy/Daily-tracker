@@ -47,7 +47,6 @@ router.post('/login', async (req, res) => {
         id: userId,
         username: user.username,
         email: user.email,
-        streak: user.streak || { count: 0, lastCompletedDate: null },
         coachSettings: user.coachSettings || { personality: 'sergeant', voiceEnabled: false }
       },
       dbStatus: getMongoStatus()
@@ -71,7 +70,6 @@ router.get('/me', authMiddleware, async (req, res) => {
         id: req.user.userId,
         username: user.username,
         email: user.email,
-        streak: user.streak || { count: 0, lastCompletedDate: null },
         coachSettings: user.coachSettings || { personality: 'sergeant', voiceEnabled: false }
       },
       dbStatus: getMongoStatus()

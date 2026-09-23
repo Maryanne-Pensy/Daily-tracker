@@ -1,5 +1,6 @@
 // End-to-end test: starts the server in local-JSON mode against a throwaway
-// database shaped like the old copywriting tracker, then checks the migration
+// database shaped like the old copywriting tracker, checks the old records are
+// hidden (not deleted)
 // and every Builder OS endpoint. Run with: npm test
 const assert = require('assert');
 const fs = require('fs');
@@ -96,21 +97,23 @@ async function run() {
 
   // --- Migration
   let t = (await api('GET', '/api/tracker/today')).body;
-  const archive = (await api('GET', '/api/content?stream=copywriting')).body.items;
-  assert.strictEqual(archive.length, 30, 'old calendar kept as copywriting archive');
-  assert.strictEqual(archive.filter(c => c.status === 'posted').length, 4, 'posted items stay posted');
-  assert.strictEqual(archive[0].script, 'old script', 'scripts preserved');
-  assert.strictEqual(archive[5].status, 'idea', 'pending -> idea');
+  // Old-tracker records are hidden everywhere (but not deleted)
+  assert.strictEqual((await api('GET', '/api/content?stream=copywriting')).body.items.length, 0, 'old calendar hidden');
+  assert.strictEqual((await api('GET', '/api/content?stream=legacy')).body.items.length, 0, 'legacy stream hidden');
+  assert.strictEqual((await api('GET', '/api/content')).body.items.length, 30, 'only the Slotly plan is visible');
+  assert.strictEqual((await api('PUT', '/api/content/cal_1', { title: 'x' })).status, 404, 'old items not editable');
   const slotly = (await api('GET', '/api/content?stream=slotly')).body.items;
   assert.strictEqual(slotly.length, 30, 'Slotly 30-day plan seeded');
   assert.strictEqual(slotly[0].date, today, 'plan starts today');
-  const oldLeads = (await api('GET', '/api/prospects?kind=copywriting')).body.items;
-  assert.strictEqual(oldLeads.length, 1, 'old lead archived, not deleted');
-  assert.strictEqual(oldLeads[0].name, 'EcoSocks');
-  assert.strictEqual((await api('GET', '/api/prospects?kind=clinic')).body.items.length, 0, 'old lead not on clinic board');
+  assert.strictEqual((await api('GET', '/api/prospects')).body.items.length, 0, 'old lead hidden');
+  assert.strictEqual((await api('GET', '/api/prospects?kind=legacy')).body.items.length, 0, 'old lead hidden by kind too');
   const hist = (await api('GET', '/api/tracker/history')).body.history;
-  assert.ok(hist.some(h => h.legacy && h.date === '2026-09-14' && h.score === 6), 'legacy history preserved');
-  assert.strictEqual(t.streak.count, 1, 'yesterday\'s legacy full day counts toward streak');
+  assert.ok(hist.every(h => h.date === today), 'old daily sheets hidden from history');
+  assert.strictEqual(t.streak.count, 0, 'old sheets do not count toward the streak');
+  const raw = JSON.parse(fs.readFileSync(DB_PATH, 'utf-8'));
+  assert.strictEqual(raw.calendar.filter(c => c.stream === 'legacy').length, 30, 'old calendar still stored');
+  assert.strictEqual(raw.leads.filter(l => l.kind === 'legacy').length, 1, 'old lead still stored');
+  assert.strictEqual(raw.progress.filter(d => d.checked).length, 3, 'old daily sheets still stored');
   assert.strictEqual(t.parkedCount, 1, 'gym/salon project parked');
   assert.strictEqual(t.products[0].name, 'Cybersecurity Guide');
   assert.strictEqual(t.learning.name, 'Copywriting Course');
@@ -124,7 +127,7 @@ async function run() {
   t = (await api('PUT', '/api/tracker/today', { mission: 'Finish payment integration', missionDone: true })).body;
   assert.strictEqual(t.day.mission, 'Finish payment integration');
   assert.ok(t.score.mainMoved, 'mission done moves the main mission');
-  assert.strictEqual(t.streak.count, 2, 'streak = yesterday + today');
+  assert.strictEqual(t.streak.count, 1, 'today counts once the main mission moves');
   t = (await api('PUT', '/api/tracker/today', {
     needle: [{ category: 'customers', text: 'DM 5 clinics', done: true }],
     productWork: true, learningDone: true
@@ -156,7 +159,7 @@ async function run() {
   assert.strictEqual(contacted.status, 'contacted');
   assert.strictEqual(contacted.nextFollowUp, addDays(today, 3));
   await api('PUT', `/api/prospects/${lead._id}`, { status: 'demo_booked' });
-  const pl = (await api('GET', '/api/prospects?kind=clinic')).body.stats;
+  const pl = (await api('GET', '/api/prospects')).body.stats;
   assert.deepStrictEqual([pl.prospects, pl.contacted, pl.replies, pl.demosBooked, pl.paying], [1, 1, 1, 1, 0]);
 
   // --- Parking lot, TradeIQ, learning

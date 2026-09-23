@@ -12,7 +12,7 @@ const CLINIC_STAGES = ['researching', 'contacted', 'replied', 'demo_booked', 'de
 const CLOSED_STATUSES = ['paying', 'not_interested'];
 
 function prospectStats(leads, today) {
-  const clinics = leads.filter(l => (l.kind || 'clinic') === 'clinic');
+  const clinics = leads.filter(l => l.kind === 'clinic');
   const stage = l => CLINIC_STAGES.indexOf(l.status);
   return {
     prospects: clinics.length,
@@ -48,7 +48,7 @@ async function getOrCreateDay(userId, date, user) {
     }
   }
   if ((existing.schemaVersion || 1) < 2) {
-    // A day started on the old copywriter sheet: add the new fields, keep `checked`.
+    // A day record from the old tracker: add the new fields.
     return storage.update('progress', userId, existing._id, freshDay(date, user));
   }
   return existing;
@@ -95,7 +95,7 @@ function scoreDay(day, type, videosPosted) {
 // Consecutive days the main mission moved. An unfinished weekend day doesn't
 // break the streak — focus means not doing everything every day.
 async function computeStreak(userId, today) {
-  const done = await storage.find('progress', userId, { isCompleted: true });
+  const done = (await storage.find('progress', userId, { isCompleted: true })).filter(d => (d.schemaVersion || 1) >= 2);
   const dates = new Set(done.map(d => d.date));
   let cursor = dates.has(today) ? today : addDays(today, -1);
   let count = 0;

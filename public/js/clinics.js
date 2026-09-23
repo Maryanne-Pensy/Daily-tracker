@@ -12,7 +12,6 @@ const STATUSES = [
 const CLOSED = ['paying', 'not_interested'];
 
 let leads = [];
-let archived = [];
 let stats = null;
 let filter = 'all';
 let today = '';
@@ -36,13 +35,9 @@ async function initClinicsPage() {
 
 async function loadLeads() {
   try {
-    const [clinicRes, archiveRes] = await Promise.all([
-      API.get('/api/prospects?kind=clinic'),
-      API.get('/api/prospects?kind=copywriting')
-    ]);
+    const clinicRes = await API.get('/api/prospects');
     leads = clinicRes ? clinicRes.items : [];
     stats = clinicRes ? clinicRes.stats : null;
-    archived = archiveRes ? archiveRes.items : [];
     render();
   } catch (err) {
     API.showToast('Failed to load prospects.');
@@ -74,7 +69,6 @@ function renderStats() {
 function renderFilters() {
   const due = leads.filter(isDue).length;
   const chips = [['all', 'All'], ['due', `Follow-ups due (${due})`], ['active', 'Active pipeline'], ['closed', 'Paying / not interested']];
-  if (archived.length) chips.push(['archive', `Old copywriting leads (${archived.length})`]);
   $('filters').innerHTML = chips.map(([key, label]) =>
     `<button class="chip ${filter === key ? 'active' : ''}" data-filter="${key}">${label}</button>`).join('');
 }
@@ -130,22 +124,7 @@ function leadHtml(l) {
   </div>`;
 }
 
-function archivedHtml(l) {
-  return `
-  <div class="item-row">
-    <div class="item-main" style="display:block;">
-      <b>${API.esc(l.name || l.clientName)}</b> <span class="item-meta">· ${API.esc(l.status)} · copywriting lead (archived)</span>
-      ${l.emailGaps ? `<div class="small muted" style="margin-top:4px;">Gaps: ${API.esc(l.emailGaps)}</div>` : ''}
-      ${l.pitchSample ? `<div class="small muted" style="margin-top:4px;font-style:italic;">${API.esc(l.pitchSample)}</div>` : ''}
-    </div>
-  </div>`;
-}
-
 function renderList() {
-  if (filter === 'archive') {
-    $('leadList').innerHTML = archived.map(archivedHtml).join('') || '<div class="empty">No archived leads.</div>';
-    return;
-  }
   const list = visibleLeads();
   $('leadList').innerHTML = list.length
     ? list.map(leadHtml).join('')
@@ -153,7 +132,7 @@ function renderList() {
 }
 
 async function refreshStats() {
-  const res = await API.get('/api/prospects?kind=clinic').catch(() => null);
+  const res = await API.get('/api/prospects').catch(() => null);
   if (res) {
     stats = res.stats;
     renderStats();
@@ -226,7 +205,6 @@ function setupEvents() {
       $('qaName').value = '';
       $('qaLink').value = '';
       $('qaName').focus();
-      if (filter === 'archive') filter = 'all';
       renderFilters();
       renderList();
       refreshStats();

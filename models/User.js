@@ -20,11 +20,6 @@ const userSchema = new mongoose.Schema({
     required: [true, 'Password is required'],
     minlength: 6
   },
-  // Legacy cached streak; the live streak is computed from DailyProgress.
-  streak: {
-    count: { type: Number, default: 0 },
-    lastCompletedDate: { type: String, default: null }
-  },
   coachSettings: {
     personality: { type: String, default: 'sergeant' }, // sergeant, mom, wallstreet, ramsay
     voiceEnabled: { type: Boolean, default: false },

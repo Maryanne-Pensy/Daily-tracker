@@ -25,7 +25,8 @@ const router = crudRouter('leads', {
     }
     return updates;
   },
-  decorateList: (items) => ({ stats: prospectStats(items, todayStr()) })
+  decorateList: (items) => ({ stats: prospectStats(items, todayStr()) }),
+  visible: lead => lead.kind === 'clinic'
 });
 
 // POST /api/prospects/:id/contacted — one-tap "Contacted today"
@@ -33,7 +34,7 @@ router.post('/:id/contacted', authMiddleware, async (req, res) => {
   try {
     const userId = req.user.userId;
     const lead = await storage.findOne('leads', userId, { _id: req.params.id }).catch(() => null);
-    if (!lead) return res.status(404).json({ error: 'Prospect not found.' });
+    if (!lead || lead.kind !== 'clinic') return res.status(404).json({ error: 'Prospect not found.' });
     const today = todayStr();
     const item = await storage.update('leads', userId, lead._id, {
       lastContact: today,

@@ -20,7 +20,8 @@ function crudRouter(col, {
   defaults = () => ({}),
   beforeSave = (updates) => updates,
   canDelete = () => true,
-  decorateList = () => ({})
+  decorateList = () => ({}),
+  visible = () => true
 }) {
   const router = express.Router();
   router.use(authMiddleware);
@@ -28,7 +29,7 @@ function crudRouter(col, {
   router.get('/', async (req, res) => {
     try {
       await storage.ensureSetup(req.user.userId);
-      const items = await storage.find(col, req.user.userId, pick(req.query, filters), sort);
+      const items = (await storage.find(col, req.user.userId, pick(req.query, filters), sort)).filter(visible);
       res.json({ items, ...decorateList(items, req) });
     } catch (err) {
       console.error(`List ${label} error:`, err);
@@ -50,7 +51,7 @@ function crudRouter(col, {
   router.put('/:id', async (req, res) => {
     try {
       const existing = await storage.findOne(col, req.user.userId, { _id: req.params.id }).catch(() => null);
-      if (!existing) return res.status(404).json({ error: `${label} not found.` });
+      if (!existing || !visible(existing)) return res.status(404).json({ error: `${label} not found.` });
       const item = await storage.update(col, req.user.userId, req.params.id, beforeSave(pick(req.body, fields), existing));
       res.json({ success: true, item });
     } catch (err) {
@@ -62,7 +63,8 @@ function crudRouter(col, {
   router.delete('/:id', async (req, res) => {
     try {
       const existing = await storage.findOne(col, req.user.userId, { _id: req.params.id }).catch(() => null);
-      if (existing && !canDelete(existing)) {
+      if (!existing || !visible(existing)) return res.status(404).json({ error: `${label} not found.` });
+      if (!canDelete(existing)) {
         return res.status(400).json({ error: `This ${label} can't be deleted.` });
       }
       await storage.remove(col, req.user.userId, req.params.id);

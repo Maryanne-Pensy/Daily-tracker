@@ -1,9 +1,8 @@
 const mongoose = require('mongoose');
 
-// One flexible content model for every stream:
-//   slotly      – the 30-day "booked demo calls" marketing plan
-//   products    – digital-product / tech videos (2 per day target)
-//   copywriting – archived calendar from the old copywriting tracker
+// One flexible content model for both streams:
+//   slotly   – the 30-day "booked demo calls" marketing plan
+//   products – digital-product / tech videos (2 per day target)
 const contentCalendarSchema = new mongoose.Schema({
   userId: {
     type: mongoose.Schema.Types.ObjectId,
@@ -27,7 +26,6 @@ const contentCalendarSchema = new mongoose.Schema({
   results: { type: String, default: '' },
   script: { type: String, default: '' },
   notes: { type: String, default: '' },
-  legacyStatus: { type: String, default: '' },
   createdAt: { type: Date, default: Date.now },
   updatedAt: { type: Date, default: Date.now }
 });

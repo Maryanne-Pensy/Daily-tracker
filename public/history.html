@@ -49,31 +49,6 @@
     .history-card.incomplete {
       border-left: 4px solid var(--rust);
     }
-    .block-dots {
-      display: flex;
-      gap: 6px;
-      margin-top: 6px;
-    }
-    .block-dot {
-      width: 14px;
-      height: 14px;
-      border: 1px solid var(--ink);
-      display: inline-block;
-      position: relative;
-    }
-    .block-dot.done {
-      background: var(--teal);
-      border-color: var(--teal);
-    }
-    .block-dot.done::after {
-      content: '';
-      position: absolute;
-      left: 3px; top: 1px;
-      width: 4px; height: 7px;
-      border: solid var(--paper);
-      border-width: 0 1.5px 1.5px 0;
-      transform: rotate(40deg);
-    }
   </style>
 </head>
 <body>
@@ -84,7 +59,7 @@
   <div class="page-header">
     <div>
       <h1 class="page-title">History</h1>
-      <p class="page-subtitle">Every day logged — Builder OS days and the old copywriting sheets</p>
+      <p class="page-subtitle">Every day logged — mission, score, and what moved the needle</p>
     </div>
   </div>
 

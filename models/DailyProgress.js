@@ -24,20 +24,9 @@ const dailyProgressSchema = new mongoose.Schema({
     required: true,
     index: true
   },
-  // 1 = old copywriter 6-block sheet, 2 = Builder OS day
+  // 2 = Builder OS day; older records from the previous tracker are hidden
   schemaVersion: { type: Number, default: 1 },
 
-  // Legacy copywriter sheet (kept for history)
-  checked: {
-    type: [Boolean],
-    default: undefined
-  },
-  completedCount: {
-    type: Number,
-    default: 0
-  },
-
-  // Builder OS day
   mission: { type: String, default: '' },
   missionDone: { type: Boolean, default: false },
   slotlyChecklist: { type: [checkItem], default: undefined },

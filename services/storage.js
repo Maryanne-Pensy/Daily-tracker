@@ -211,12 +211,11 @@ async function updateUser(userId, updates) {
   return null;
 }
 
-// ---------- One-time setup & migration from the copywriting tracker ----------
-// Never deletes anything: old calendar items become the 'copywriting' archive
-// stream, old leads become kind 'copywriting', old daily sheets stay as history.
+// ---------- One-time setup ----------
+// Records left over from the old copywriting tracker are tagged 'legacy' and
+// never returned by the API. They are not deleted.
 
 const SETUP_VERSION = 1;
-const LEGACY_STATUS = { pending: 'idea', drafted: 'scripted', recorded: 'recorded', posted: 'posted' };
 const setupRuns = new Map();
 
 function ensureSetup(userId) {
@@ -237,29 +236,17 @@ async function runSetup(userId) {
   if (!user) return;
   const firstSetup = (user.setupVersion || 0) < SETUP_VERSION;
 
-  // 1. Old copywriting calendar -> archived stream (keeps status, script, notes)
+  // 1. Hide old-tracker calendar items and leads
   const content = await find('calendar', userId);
-  for (const item of content.filter(c => !c.stream)) {
-    await update('calendar', userId, item._id, {
-      stream: 'copywriting',
-      legacyStatus: item.status || '',
-      status: LEGACY_STATUS[item.status] || item.status || 'idea',
-      postedDate: item.status === 'posted' ? (item.date || '') : ''
-    });
+  for (const item of content.filter(c => !c.stream || c.stream === 'copywriting')) {
+    await update('calendar', userId, item._id, { stream: 'legacy' });
   }
-
-  // 2. Old copywriting leads -> archived kind
   const leads = await find('leads', userId);
-  for (const lead of leads.filter(l => !l.kind)) {
-    await update('leads', userId, lead._id, {
-      kind: 'copywriting',
-      name: lead.clientName || '',
-      link: lead.storeUrl || '',
-      contact: lead.contactEmail || ''
-    });
+  for (const lead of leads.filter(l => !l.kind || l.kind === 'copywriting')) {
+    await update('leads', userId, lead._id, { kind: 'legacy' });
   }
 
-  // 3. Built-in projects always exist
+  // 2. Built-in projects always exist
   const projects = await find('projects', userId);
   for (const p of seed.DEFAULT_PROJECTS.filter(p => p.key)) {
     if (!projects.some(x => x.key === p.key)) {
@@ -268,7 +255,7 @@ async function runSetup(userId) {
   }
 
   if (firstSetup) {
-    // 4. Slotly 30-day marketing plan, starting today
+    // 3. Slotly 30-day marketing plan, starting today
     if (!content.some(c => c.stream === 'slotly')) {
       const start = todayStr();
       for (const [i, [contentType, pillar, title, hook, cta]] of seed.SLOTLY_30_DAY_PLAN.entries()) {
@@ -279,7 +266,7 @@ async function runSetup(userId) {
         });
       }
     }
-    // 5. Parked ideas, first product, learning track
+    // 4. Parked ideas, first product, learning track
     for (const p of seed.DEFAULT_PROJECTS.filter(p => !p.key)) {
       if (!projects.some(x => x.name === p.name)) await create('projects', userId, { ...p, dateAdded: todayStr() });
     }

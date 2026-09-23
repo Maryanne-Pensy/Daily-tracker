@@ -36,18 +36,9 @@ function renderHistoryList(history) {
 
   container.innerHTML = history.map(item => {
     const dateFormatted = API.fmtDate(item.date, { weekday: 'long', year: 'numeric', month: 'short', day: 'numeric' });
-    let detail;
-    if (item.legacy) {
-      // Old copywriter sheet: 6 blocks
-      const checked = item.checked || [];
-      detail = `<div class="block-dots">${[0, 1, 2, 3, 4, 5].map(i =>
-        `<span class="block-dot ${checked[i] ? 'done' : ''}" title="Block ${i + 1}"></span>`).join('')}</div>
-        <div class="small muted mono" style="margin-top:4px;">copywriting sheet</div>`;
-    } else {
-      detail = `
-        ${item.mission ? `<div class="small" style="margin-top:4px;">🔥 ${API.esc(item.mission)}</div>` : ''}
-        ${item.needleDone.length ? `<div class="small muted" style="margin-top:2px;">${item.needleDone.map(API.esc).join(' · ')}</div>` : ''}`;
-    }
+    const detail = `
+      ${item.mission ? `<div class="small" style="margin-top:4px;">🔥 ${API.esc(item.mission)}</div>` : ''}
+      ${item.needleDone.length ? `<div class="small muted" style="margin-top:2px;">${item.needleDone.map(API.esc).join(' · ')}</div>` : ''}`;
     return `
       <div class="history-card ${item.mainMoved ? 'completed' : 'incomplete'}">
         <div style="flex:1;min-width:0;">

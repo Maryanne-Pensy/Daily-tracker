@@ -4,7 +4,7 @@ const { crudRouter } = require('./crud');
 const { todayStr } = require('../utils/dates');
 
 const STATUSES = ['idea', 'scripted', 'recorded', 'edited', 'scheduled', 'posted'];
-const STREAMS = ['slotly', 'products', 'copywriting'];
+const STREAMS = ['slotly', 'products'];
 
 // Keep postedDate in step with status so "posted today" counts are exact.
 function applyPostedDate(updates, existing) {
@@ -30,12 +30,15 @@ const router = crudRouter('calendar', {
   filters: ['stream', 'status', 'product', 'date'],
   sort: { day: 1, date: 1, createdAt: 1 },
   defaults: () => ({ stream: 'products', status: 'idea', date: todayStr() }),
-  beforeSave: applyPostedDate
+  beforeSave: applyPostedDate,
+  visible: item => STREAMS.includes(item.stream)
 });
 
 // POST /api/content/:id/posted — one-tap "Posted today"
 router.post('/:id/posted', authMiddleware, async (req, res) => {
   try {
+    const existing = await storage.findOne('calendar', req.user.userId, { _id: req.params.id }).catch(() => null);
+    if (!existing || !STREAMS.includes(existing.stream)) return res.status(404).json({ error: 'Content item not found.' });
     const item = await storage.update('calendar', req.user.userId, req.params.id, {
       status: 'posted',
       postedDate: todayStr()

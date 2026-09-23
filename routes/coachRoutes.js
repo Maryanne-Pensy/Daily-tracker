@@ -225,8 +225,6 @@ router.get('/assessment', authMiddleware, async (req, res) => {
       situation: fallback.situation,
       points: st.points,
       max: st.max,
-      completedCount: st.points,
-      totalBlocks: st.max,
       streakCount: st.streak,
       personality,
       profile,
