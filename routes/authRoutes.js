@@ -6,7 +6,7 @@ const storage = require('../services/storage');
 const { getMongoStatus } = require('../config/db');
 
 const router = express.Router();
-const JWT_SECRET = process.env.JWT_SECRET || 'super_secret_daily_tracker_jwt_key_2026';
+const { JWT_SECRET } = require('../config/jwt');
 
 // Public registration is intentionally disabled for this single-user app.
 router.post('/register', async (req, res) => {
@@ -89,8 +89,7 @@ router.put('/settings', authMiddleware, async (req, res) => {
     const incoming = req.body.coachSettings || {};
     const coachSettings = {
       personality: incoming.personality || current.personality || 'sergeant',
-      voiceEnabled: incoming.voiceEnabled !== undefined ? Boolean(incoming.voiceEnabled) : Boolean(current.voiceEnabled),
-      rageLevelOverride: current.rageLevelOverride === undefined ? null : current.rageLevelOverride
+      voiceEnabled: incoming.voiceEnabled !== undefined ? Boolean(incoming.voiceEnabled) : Boolean(current.voiceEnabled)
     };
     const updated = await storage.updateUser(req.user.userId, { coachSettings });
     res.json({ success: true, coachSettings: updated ? updated.coachSettings : coachSettings });

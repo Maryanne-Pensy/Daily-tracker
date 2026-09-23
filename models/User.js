@@ -22,8 +22,7 @@ const userSchema = new mongoose.Schema({
   },
   coachSettings: {
     personality: { type: String, default: 'sergeant' }, // sergeant, mom, wallstreet, ramsay
-    voiceEnabled: { type: Boolean, default: false },
-    rageLevelOverride: { type: Number, default: null }
+    voiceEnabled: { type: Boolean, default: false }
   },
   preferences: {
     // Editable default Slotly checklist: [{ label, tag }]

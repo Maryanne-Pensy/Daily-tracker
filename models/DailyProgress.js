@@ -44,10 +44,6 @@ const dailyProgressSchema = new mongoose.Schema({
     type: Boolean,
     default: false
   },
-  notes: {
-    type: String,
-    default: ''
-  },
   updatedAt: {
     type: Date,
     default: Date.now

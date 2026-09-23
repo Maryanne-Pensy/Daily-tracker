@@ -6,7 +6,7 @@ const { todayStr } = require('../utils/dates');
 
 const router = express.Router();
 
-const TEXT_FIELDS = ['mission', 'productWorkNote', 'learningNote', 'notes'];
+const TEXT_FIELDS = ['mission', 'productWorkNote', 'learningNote'];
 const BOOL_FIELDS = ['missionDone', 'productWork', 'learningDone'];
 const NEEDLE_CATEGORIES = ['build', 'customers', 'validation'];
 

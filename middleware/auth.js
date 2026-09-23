@@ -1,16 +1,10 @@
 const jwt = require('jsonwebtoken');
-
-const JWT_SECRET = process.env.JWT_SECRET || 'super_secret_daily_tracker_jwt_key_2026';
+const { JWT_SECRET } = require('../config/jwt');
 
 function authMiddleware(req, res, next) {
+  // Tokens only travel in the Authorization header, never in URLs (they'd end up in logs).
   const authHeader = req.headers.authorization;
-  let token = null;
-
-  if (authHeader && authHeader.startsWith('Bearer ')) {
-    token = authHeader.split(' ')[1];
-  } else if (req.query && req.query.token) {
-    token = req.query.token;
-  }
+  const token = authHeader && authHeader.startsWith('Bearer ') ? authHeader.split(' ')[1] : null;
 
   if (!token) {
     return res.status(401).json({ error: 'Authentication required. No token provided.' });
