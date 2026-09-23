@@ -258,11 +258,9 @@ async function runSetup(userId) {
     // 3. Slotly 30-day marketing plan, starting today
     if (!content.some(c => c.stream === 'slotly')) {
       const start = todayStr();
-      for (const [i, [contentType, pillar, title, hook, cta]] of seed.SLOTLY_30_DAY_PLAN.entries()) {
+      for (const post of seed.SLOTLY_30_DAY_PLAN) {
         await create('calendar', userId, {
-          stream: 'slotly', day: i + 1, date: addDays(start, i),
-          contentType, title, hook, cta, platform: 'Instagram',
-          status: 'idea', notes: 'Pillar: ' + pillar
+          ...post, stream: 'slotly', date: addDays(start, post.day - 1), platform: 'Instagram', status: 'idea'
         });
       }
     }
